@@ -1,0 +1,32 @@
+name: Build and verify server
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  test:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-dotnet@v6
+        with:
+          dotnet-version: '10.0.x'
+      - name: Build
+        run: dotnet build src/Server/NightStud.Server.csproj -c Release
+      - name: Service and announcement integration
+        run: dotnet run --project src/ServiceTests/NightStud.ServiceTests.csproj -c Release -- work/service-test src/Server/bin/Release/net10.0/NightStud.Server.dll
+      - name: Wallet and physical goods
+        run: dotnet run --project src/CashTests/NightStud.CashTests.csproj -c Release -- work/cash-test
+      - name: Multiplayer rules
+        run: dotnet run --project src/GroupTests/NightStud.GroupTests.csproj -c Release -- work/group-test
+      - name: Larger wagers
+        run: dotnet run --project src/WagerTests/NightStud.WagerTests.csproj -c Release -- work/wager-test
+      - name: Wire protocol and input boundaries
+        run: dotnet run --project src/ProtocolTests/NightStud.ProtocolTests.csproj -c Release -- work/protocol-test

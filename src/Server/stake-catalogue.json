@@ -1,0 +1,3106 @@
+{
+  "gameBuild": "26525552",
+  "items": [
+    {
+      "id": "black_injector",
+      "label": "赛纳普斯注射器",
+      "atlas": "Items/items_medical",
+      "sprite": "injector_black",
+      "baseValue": 350
+    },
+    {
+      "id": "pink_injector",
+      "label": "奥克西莫注射器",
+      "atlas": "Items/items_medical",
+      "sprite": "injector_pink",
+      "baseValue": 50
+    },
+    {
+      "id": "pink_alt_injector",
+      "label": "奥克莫吸注射器",
+      "atlas": "Items/items_medical",
+      "sprite": "injector_pink_alt",
+      "baseValue": 28
+    },
+    {
+      "id": "large_purple_injector",
+      "label": "免疫宁注射器",
+      "atlas": "Items/items_medical",
+      "sprite": "injector_purple_large",
+      "baseValue": 160
+    },
+    {
+      "id": "pure_white_injector",
+      "label": "纳洛通注射器",
+      "atlas": "Items/items_medical",
+      "sprite": "injector_pure_white_s",
+      "baseValue": 30
+    },
+    {
+      "id": "birth_control_pill",
+      "label": "避孕药",
+      "atlas": "Items/items_medical",
+      "sprite": "items_medical_15",
+      "baseValue": 15
+    },
+    {
+      "id": "fanta_pill",
+      "label": "芬太片",
+      "atlas": "Items/items_medical",
+      "sprite": "oxycodone_pill",
+      "baseValue": 12
+    },
+    {
+      "id": "phagimycin_pill",
+      "label": "噬菌霉素片",
+      "atlas": "Items/items_medical",
+      "sprite": "pill1",
+      "baseValue": 25
+    },
+    {
+      "id": "unlicensed_phagimycin_pill",
+      "label": "无证噬菌霉素片",
+      "atlas": "Items/items_medical",
+      "sprite": "pill2",
+      "baseValue": 5
+    },
+    {
+      "id": "zyanide_pill",
+      "label": "山奈德片",
+      "atlas": "Items/items_medical",
+      "sprite": "items_medical_12",
+      "baseValue": 33
+    },
+    {
+      "id": "smelling_salt",
+      "label": "嗅盐",
+      "atlas": "Items/items_medical",
+      "sprite": "smelling_salt",
+      "baseValue": 15
+    },
+    {
+      "id": "bandage_item",
+      "label": "基础绷带",
+      "atlas": "Items/items_medical",
+      "sprite": "bandage_small",
+      "baseValue": 8
+    },
+    {
+      "id": "hemostatic_bandage_item",
+      "label": "止血绷带",
+      "atlas": "Items/items_medical",
+      "sprite": "hemostatic_bandage_small",
+      "baseValue": 16
+    },
+    {
+      "id": "topical_bandage_item",
+      "label": "外用药膏绷带",
+      "atlas": "Items/items_medical",
+      "sprite": "topical_bandage_small",
+      "baseValue": 16
+    },
+    {
+      "id": "blood_bag",
+      "label": "血袋",
+      "atlas": "Items/items_medical",
+      "sprite": "blood_bag",
+      "baseValue": 33
+    },
+    {
+      "id": "blue_blood_bag",
+      "label": "一袋“蓝血”",
+      "atlas": "Items/items_medical",
+      "sprite": "blue_blood_bag",
+      "baseValue": 250
+    },
+    {
+      "id": "dream_dust",
+      "label": "一小瓶“梦尘”",
+      "atlas": "Items/items_medical",
+      "sprite": "dream_dust",
+      "baseValue": 18
+    },
+    {
+      "id": "nightmare_dust",
+      "label": "一小瓶“梦魇尘”",
+      "atlas": "Items/items_medical",
+      "sprite": "nightmare_dust",
+      "baseValue": 36
+    },
+    {
+      "id": "caffeine_pill",
+      "label": "咖啡因药片",
+      "atlas": "Items/items_medical",
+      "sprite": "cafeine_pill",
+      "baseValue": 10
+    },
+    {
+      "id": "salve",
+      "label": "南丁格尔软膏",
+      "atlas": "Items/items_medical",
+      "sprite": "salve",
+      "baseValue": 80
+    },
+    {
+      "id": "rubbing_alcohol",
+      "label": "医用酒精",
+      "atlas": "Items/items_medical",
+      "sprite": "black_bottle",
+      "baseValue": 35
+    },
+    {
+      "id": "zerochew",
+      "label": "一板零嚼",
+      "atlas": "Items/items_medical",
+      "sprite": "zerochew",
+      "baseValue": 8
+    },
+    {
+      "id": "chem_scanner",
+      "label": "成分光谱仪",
+      "atlas": "Items/items_amenities",
+      "sprite": "chem_scanner",
+      "baseValue": 400
+    },
+    {
+      "id": "surgery_tool",
+      "label": "外科手术工具套装",
+      "atlas": "Items/items_tool",
+      "sprite": "surgery_toolkit",
+      "baseValue": 200
+    },
+    {
+      "id": "energy_credit",
+      "label": "能量电池",
+      "atlas": "Items/items_tool",
+      "sprite": "battery100",
+      "baseValue": 110
+    },
+    {
+      "id": "energy_credit_breeder",
+      "label": "自充电能量电池",
+      "atlas": "Items/items_tool2",
+      "sprite": "sbattery100",
+      "baseValue": 500
+    },
+    {
+      "id": "energy_credit_ext",
+      "label": "能量电池（2型）",
+      "atlas": "Items/items_tool",
+      "sprite": "battery_ext100",
+      "baseValue": 280
+    },
+    {
+      "id": "energy_credit_dis",
+      "label": "一次性电池",
+      "atlas": "Items/items_tool",
+      "sprite": "battery_dis100",
+      "baseValue": 331
+    },
+    {
+      "id": "current_converter",
+      "label": "电流转换器",
+      "atlas": "Items/items_tool2",
+      "sprite": "current_converter",
+      "baseValue": 300
+    },
+    {
+      "id": "energy_credit_hyp",
+      "label": "超科技能源单元",
+      "atlas": "Items/items_tool2",
+      "sprite": "battery_hyp",
+      "baseValue": 2500
+    },
+    {
+      "id": "glass_shard",
+      "label": "碎玻璃",
+      "atlas": "Items/items_weapons_melee",
+      "sprite": "glass_shard",
+      "baseValue": 2
+    },
+    {
+      "id": "flashlight",
+      "label": "手电筒",
+      "atlas": "Items/items_misc",
+      "sprite": "flashlight3",
+      "baseValue": 40
+    },
+    {
+      "id": "cigarette_guide",
+      "label": "海明威鉴定指南",
+      "atlas": "Items/items_misc",
+      "sprite": "guide1",
+      "baseValue": 50
+    },
+    {
+      "id": "cigarette_color",
+      "label": "海明威色卡",
+      "atlas": "Items/itematlas",
+      "sprite": "cigarette_color_guide",
+      "baseValue": 50
+    },
+    {
+      "id": "hand_guide",
+      "label": "仿生机械手鉴定指南",
+      "atlas": "Items/items_misc",
+      "sprite": "manual5",
+      "baseValue": 50
+    },
+    {
+      "id": "fuel_guide",
+      "label": "等离子燃料匣鉴定指南",
+      "atlas": "Items/items_misc",
+      "sprite": "manual1",
+      "baseValue": 50
+    },
+    {
+      "id": "ribwich_guide",
+      "label": "肋明治鉴定指南",
+      "atlas": "Items/items_misc",
+      "sprite": "manual4",
+      "baseValue": 50
+    },
+    {
+      "id": "stamp_guide",
+      "label": "食品券鉴定手册",
+      "atlas": "Items/items_misc",
+      "sprite": "guide3",
+      "baseValue": 50
+    },
+    {
+      "id": "injector_guide",
+      "label": "免疫宁检测指南",
+      "atlas": "Items/items_misc",
+      "sprite": "guide5",
+      "baseValue": 50
+    },
+    {
+      "id": "water_guide",
+      "label": "水资源交易手册",
+      "atlas": "Items/items_misc",
+      "sprite": "book1",
+      "baseValue": 25
+    },
+    {
+      "id": "lottery_info",
+      "label": "下层区彩票说明",
+      "atlas": "Items/items_misc",
+      "sprite": "guide0",
+      "baseValue": 1
+    },
+    {
+      "id": "hydroponic_guide",
+      "label": "水培农业手册",
+      "atlas": "Items/items_misc",
+      "sprite": "book3",
+      "baseValue": 25
+    },
+    {
+      "id": "chemistry_guide",
+      "label": "化学手册",
+      "atlas": "Items/items_misc",
+      "sprite": "book2",
+      "baseValue": 50
+    },
+    {
+      "id": "ingot_book",
+      "label": "冶金手册",
+      "atlas": "Items/items_misc",
+      "sprite": "book4",
+      "baseValue": 25
+    },
+    {
+      "id": "wine_book",
+      "label": "荧光莓果酿发酵指南",
+      "atlas": "Items/items_misc",
+      "sprite": "book5",
+      "baseValue": 25
+    },
+    {
+      "id": "aug_id_guide",
+      "label": "改造体鉴别指南",
+      "atlas": "Items/items_misc",
+      "sprite": "aug_id_guide",
+      "baseValue": 50
+    },
+    {
+      "id": "logo_checker",
+      "label": "共和国标志校验卡",
+      "atlas": "Items/items_misc",
+      "sprite": "republic_logo_checker",
+      "baseValue": 50
+    },
+    {
+      "id": "scav_token",
+      "label": "拾荒者信物",
+      "atlas": "Items/itematlas",
+      "sprite": "scav_medal",
+      "baseValue": 100
+    },
+    {
+      "id": "black_lamp",
+      "label": "暗灯",
+      "atlas": "Items/items_sign",
+      "sprite": "black_lamp",
+      "baseValue": 120
+    },
+    {
+      "id": "cmd_keycard",
+      "label": "一次性钥匙卡（指挥）",
+      "atlas": "Items/items_misc",
+      "sprite": "command_keycard",
+      "baseValue": 125
+    },
+    {
+      "id": "sec_keycard",
+      "label": "一次性钥匙卡（治安）",
+      "atlas": "Items/items_misc",
+      "sprite": "sec_keycard",
+      "baseValue": 100
+    },
+    {
+      "id": "sci_keycard",
+      "label": "一次性钥匙卡（研发）",
+      "atlas": "Items/items_misc",
+      "sprite": "sci_card",
+      "baseValue": 100
+    },
+    {
+      "id": "med_keycard",
+      "label": "一次性钥匙卡（医疗）",
+      "atlas": "Items/items_misc",
+      "sprite": "med_card",
+      "baseValue": 75
+    },
+    {
+      "id": "eng_keycard",
+      "label": "一次性钥匙卡（工程）",
+      "atlas": "Items/items_misc",
+      "sprite": "eng_card",
+      "baseValue": 75
+    },
+    {
+      "id": "sup_keycard",
+      "label": "一次性钥匙卡（补给）",
+      "atlas": "Items/items_misc",
+      "sprite": "sup_card",
+      "baseValue": 40
+    },
+    {
+      "id": "ser_keycard",
+      "label": "一次性钥匙卡（服务）",
+      "atlas": "Items/items_misc",
+      "sprite": "ser_card",
+      "baseValue": 40
+    },
+    {
+      "id": "blank_keycard",
+      "label": "一次性钥匙卡（空白）",
+      "atlas": "Items/items_misc",
+      "sprite": "blank_card",
+      "baseValue": 15
+    },
+    {
+      "id": "canister_mbs",
+      "label": "MBS神经毒气",
+      "atlas": "Items/items_sec",
+      "sprite": "canister_nerve",
+      "baseValue": 400
+    },
+    {
+      "id": "food_stamp",
+      "label": "食品券（40信用点）",
+      "atlas": "Items/items_misc",
+      "sprite": "food_stamp",
+      "baseValue": 30
+    },
+    {
+      "id": "hand",
+      "label": "仿生机械手",
+      "atlas": "Items/items_inspectable",
+      "sprite": "hand_steel",
+      "baseValue": 100
+    },
+    {
+      "id": "cassette1",
+      "label": "音乐磁带 - 毅力 （完好）",
+      "atlas": "Items/items_amenities",
+      "sprite": "cassette5",
+      "baseValue": 150
+    },
+    {
+      "id": "cassette2",
+      "label": "音乐磁带 - 数据领域 （完好）",
+      "atlas": "Items/items_amenities",
+      "sprite": "cassette8",
+      "baseValue": 150
+    },
+    {
+      "id": "cassette3",
+      "label": "音乐磁带 - 高风险 （完好）",
+      "atlas": "Items/items_amenities",
+      "sprite": "cassette6",
+      "baseValue": 150
+    },
+    {
+      "id": "cassette4",
+      "label": "音乐磁带 - 星尘 （完好）",
+      "atlas": "Items/items_amenities",
+      "sprite": "cassette9",
+      "baseValue": 150
+    },
+    {
+      "id": "cassette5",
+      "label": "音乐磁带 - 余晖 （完好）",
+      "atlas": "Items/items_amenities",
+      "sprite": "cassette10",
+      "baseValue": 150
+    },
+    {
+      "id": "cassette6",
+      "label": "音乐磁带 - 太空飞行 （完好）",
+      "atlas": "Items/items_amenities",
+      "sprite": "cassette3",
+      "baseValue": 150
+    },
+    {
+      "id": "cassette7",
+      "label": "音乐磁带 - 暗物质 （完好）",
+      "atlas": "Items/items_amenities",
+      "sprite": "cassette4",
+      "baseValue": 150
+    },
+    {
+      "id": "cassette1l",
+      "label": "音乐磁带 - 毅力 （受损）",
+      "atlas": "Items/items_amenities",
+      "sprite": "cassette5",
+      "baseValue": 70
+    },
+    {
+      "id": "cassette2l",
+      "label": "音乐磁带 - 数据领域 （受损）",
+      "atlas": "Items/items_amenities",
+      "sprite": "cassette8",
+      "baseValue": 70
+    },
+    {
+      "id": "cassette3l",
+      "label": "音乐磁带 - 高风险 （受损）",
+      "atlas": "Items/items_amenities",
+      "sprite": "cassette6",
+      "baseValue": 70
+    },
+    {
+      "id": "cassette4l",
+      "label": "音乐磁带 - 星尘 （受损）",
+      "atlas": "Items/items_amenities",
+      "sprite": "cassette9",
+      "baseValue": 70
+    },
+    {
+      "id": "cassette5l",
+      "label": "音乐磁带 - 余晖 （受损）",
+      "atlas": "Items/items_amenities",
+      "sprite": "cassette10",
+      "baseValue": 70
+    },
+    {
+      "id": "cassette6l",
+      "label": "音乐磁带 - 太空飞行 （受损）",
+      "atlas": "Items/items_amenities",
+      "sprite": "cassette3",
+      "baseValue": 70
+    },
+    {
+      "id": "cassette7l",
+      "label": "音乐磁带 - 暗物质 （受损）",
+      "atlas": "Items/items_amenities",
+      "sprite": "cassette4",
+      "baseValue": 70
+    },
+    {
+      "id": "cassette1d",
+      "label": "音乐磁带 - 毅力 （损坏）",
+      "atlas": "Items/items_amenities",
+      "sprite": "cassette5",
+      "baseValue": 35
+    },
+    {
+      "id": "cassette2d",
+      "label": "音乐磁带 - 数据领域 （损坏）",
+      "atlas": "Items/items_amenities",
+      "sprite": "cassette8",
+      "baseValue": 35
+    },
+    {
+      "id": "cassette3d",
+      "label": "音乐磁带 - 高风险 （损坏）",
+      "atlas": "Items/items_amenities",
+      "sprite": "cassette6",
+      "baseValue": 35
+    },
+    {
+      "id": "cassette4d",
+      "label": "音乐磁带 - 星尘 （损坏）",
+      "atlas": "Items/items_amenities",
+      "sprite": "cassette9",
+      "baseValue": 35
+    },
+    {
+      "id": "cassette5d",
+      "label": "音乐磁带 - 余晖 （损坏）",
+      "atlas": "Items/items_amenities",
+      "sprite": "cassette10",
+      "baseValue": 35
+    },
+    {
+      "id": "cassette6d",
+      "label": "音乐磁带 - 太空飞行 （损坏）",
+      "atlas": "Items/items_amenities",
+      "sprite": "cassette3",
+      "baseValue": 35
+    },
+    {
+      "id": "cassette7d",
+      "label": "音乐磁带 - 暗物质 （损坏）",
+      "atlas": "Items/items_amenities",
+      "sprite": "cassette4",
+      "baseValue": 35
+    },
+    {
+      "id": "cassette8",
+      "label": "音乐磁带 - A Bao A Qu （完好）",
+      "atlas": "Items/items_amenities",
+      "sprite": "cassette8b",
+      "baseValue": 150
+    },
+    {
+      "id": "cassette9",
+      "label": "音乐磁带 - The Wailing （完好）",
+      "atlas": "Items/items_amenities",
+      "sprite": "cassette9b",
+      "baseValue": 150
+    },
+    {
+      "id": "cassette10",
+      "label": "音乐磁带 - Long Star River （完好）",
+      "atlas": "Items/items_amenities",
+      "sprite": "cassette10b",
+      "baseValue": 150
+    },
+    {
+      "id": "cassette11",
+      "label": "音乐磁带 - Deluge （完好）",
+      "atlas": "Items/items_amenities",
+      "sprite": "cassette11b",
+      "baseValue": 150
+    },
+    {
+      "id": "cassette12",
+      "label": "音乐磁带 - Spellsinger Radio Edition （完好）",
+      "atlas": "Items/items_amenities",
+      "sprite": "cassette12b",
+      "baseValue": 150
+    },
+    {
+      "id": "cassette13",
+      "label": "音乐磁带 - Golden Lotus （完好）",
+      "atlas": "Items/items_amenities",
+      "sprite": "cassette13b",
+      "baseValue": 150
+    },
+    {
+      "id": "cassette14",
+      "label": "音乐磁带 - Junkyard Jockey （完好）",
+      "atlas": "Items/items_amenities",
+      "sprite": "cassette14b",
+      "baseValue": 150
+    },
+    {
+      "id": "cassette8l",
+      "label": "音乐磁带 - A Bao A Qu （受损）",
+      "atlas": "Items/items_amenities",
+      "sprite": "cassette8b",
+      "baseValue": 70
+    },
+    {
+      "id": "cassette9l",
+      "label": "音乐磁带 - The Wailing （受损）",
+      "atlas": "Items/items_amenities",
+      "sprite": "cassette9b",
+      "baseValue": 70
+    },
+    {
+      "id": "cassette10l",
+      "label": "音乐磁带 - Long Star River （受损）",
+      "atlas": "Items/items_amenities",
+      "sprite": "cassette10b",
+      "baseValue": 70
+    },
+    {
+      "id": "cassette11l",
+      "label": "音乐磁带 - Deluge （受损）",
+      "atlas": "Items/items_amenities",
+      "sprite": "cassette11b",
+      "baseValue": 70
+    },
+    {
+      "id": "cassette12l",
+      "label": "音乐磁带 - Spellsinger Radio Edition （受损）",
+      "atlas": "Items/items_amenities",
+      "sprite": "cassette12b",
+      "baseValue": 70
+    },
+    {
+      "id": "cassette13l",
+      "label": "音乐磁带 - Golden Lotus （受损）",
+      "atlas": "Items/items_amenities",
+      "sprite": "cassette13b",
+      "baseValue": 70
+    },
+    {
+      "id": "cassette14l",
+      "label": "音乐磁带 - Junkyard Jockey （受损）",
+      "atlas": "Items/items_amenities",
+      "sprite": "cassette14b",
+      "baseValue": 70
+    },
+    {
+      "id": "cassette8d",
+      "label": "音乐磁带 - A Bao A Qu （损坏）",
+      "atlas": "Items/items_amenities",
+      "sprite": "cassette8b",
+      "baseValue": 35
+    },
+    {
+      "id": "cassette9d",
+      "label": "音乐磁带 - The Wailing （损坏）",
+      "atlas": "Items/items_amenities",
+      "sprite": "cassette9b",
+      "baseValue": 35
+    },
+    {
+      "id": "cassette10d",
+      "label": "音乐磁带 - Long Star River （损坏）",
+      "atlas": "Items/items_amenities",
+      "sprite": "cassette10b",
+      "baseValue": 35
+    },
+    {
+      "id": "cassette11d",
+      "label": "音乐磁带 - Deluge （损坏）",
+      "atlas": "Items/items_amenities",
+      "sprite": "cassette11b",
+      "baseValue": 35
+    },
+    {
+      "id": "cassette12d",
+      "label": "音乐磁带 - Spellsinger Radio Edition （损坏）",
+      "atlas": "Items/items_amenities",
+      "sprite": "cassette12b",
+      "baseValue": 35
+    },
+    {
+      "id": "cassette13d",
+      "label": "音乐磁带 - Golden Lotus （损坏）",
+      "atlas": "Items/items_amenities",
+      "sprite": "cassette13b",
+      "baseValue": 35
+    },
+    {
+      "id": "cassette14d",
+      "label": "音乐磁带 - Junkyard Jockey （损坏）",
+      "atlas": "Items/items_amenities",
+      "sprite": "cassette14b",
+      "baseValue": 35
+    },
+    {
+      "id": "ribwich",
+      "label": "袋装肋排三明治",
+      "atlas": "Items/items_food",
+      "sprite": "ribwich",
+      "baseValue": 150
+    },
+    {
+      "id": "scratcher",
+      "label": "刮刮乐彩票",
+      "atlas": "Items/items_misc",
+      "sprite": "scratch",
+      "baseValue": 20
+    },
+    {
+      "id": "gamblers_coin",
+      "label": "赌徒硬币",
+      "atlas": "Items/items_misc",
+      "sprite": "the_coin",
+      "baseValue": 50
+    },
+    {
+      "id": "scratcher_stack",
+      "label": "一叠刮刮乐彩票（5张）",
+      "atlas": "Items/items_misc",
+      "sprite": "scratch_stack",
+      "baseValue": 100
+    },
+    {
+      "id": "plasma_fuel",
+      "label": "等离子燃料匣",
+      "atlas": "Items/items_ship",
+      "sprite": "plasma_fuel_cell",
+      "baseValue": 300
+    },
+    {
+      "id": "aug_scanner",
+      "label": "改造体扫描仪",
+      "atlas": "Items/items_tool",
+      "sprite": "aug_scanner",
+      "baseValue": 200
+    },
+    {
+      "id": "printed_gun",
+      "label": "“解放者”3D打印手枪",
+      "atlas": "Items/items_weapons_ranged_energy",
+      "sprite": "printed_gun",
+      "baseValue": 50
+    },
+    {
+      "id": "handmade_pistol",
+      "label": "“巢火”紧凑型手枪",
+      "atlas": "Items/items_weapons_ranged_energy",
+      "sprite": "handmade_pistol",
+      "baseValue": 120
+    },
+    {
+      "id": "heavy_handmade_pistol",
+      "label": "“铁铸10”手枪",
+      "atlas": "Items/items_weapons_ranged_energy",
+      "sprite": "heavy_handmade_pistol",
+      "baseValue": 160
+    },
+    {
+      "id": "glock_receiver",
+      "label": "哨兵3型。",
+      "atlas": "Items/items_weapons_ranged_energy",
+      "sprite": "glock_receiver",
+      "baseValue": 200
+    },
+    {
+      "id": "smg",
+      "label": "“和平使者”重型冲锋枪",
+      "atlas": "Items/items_weapons_ranged_antique",
+      "sprite": "heavy_smg",
+      "baseValue": 280
+    },
+    {
+      "id": "shotgun",
+      "label": "“壁垒”双动式霰弹枪",
+      "atlas": "Items/items_weapons_ranged_antique",
+      "sprite": "shotgun",
+      "baseValue": 310
+    },
+    {
+      "id": "revolver",
+      "label": "兰斯维尔左轮手枪",
+      "atlas": "Items/items_weapons_ranged_energy",
+      "sprite": "revolver",
+      "baseValue": 240
+    },
+    {
+      "id": "stun_gun",
+      "label": "“脉冲卫士”电击枪",
+      "atlas": "Items/items_weapons_ranged_energy",
+      "sprite": "stun_gun",
+      "baseValue": 250
+    },
+    {
+      "id": "small_pistol_ammo",
+      "label": ".22 SR弹药",
+      "atlas": "Items/items_sec",
+      "sprite": "light_pistol_ammo",
+      "baseValue": 20
+    },
+    {
+      "id": "small_pistol_ammo_p",
+      "label": ".22 SR弹药（穿甲）",
+      "atlas": "Items/items_sec",
+      "sprite": "light_pistol_ammo_p",
+      "baseValue": 26
+    },
+    {
+      "id": "small_pistol_ammo_nl",
+      "label": ".22 SR弹药（非致命）",
+      "atlas": "Items/items_sec",
+      "sprite": "light_pistol_ammo_nl",
+      "baseValue": 14
+    },
+    {
+      "id": "heavy_pistol_ammo",
+      "label": "10毫米弹药",
+      "atlas": "Items/items_sec",
+      "sprite": "heavy_pistol_ammo",
+      "baseValue": 30
+    },
+    {
+      "id": "heavy_pistol_ammo_p",
+      "label": "10毫米弹药（穿甲弹）",
+      "atlas": "Items/items_sec",
+      "sprite": "heavy_pistol_ammo_p",
+      "baseValue": 36
+    },
+    {
+      "id": "heavy_pistol_ammo_nl",
+      "label": "10毫米弹药（非致命）",
+      "atlas": "Items/items_sec",
+      "sprite": "heavy_pistol_ammo_nl",
+      "baseValue": 24
+    },
+    {
+      "id": "tazer",
+      "label": "电击枪",
+      "atlas": "Items/items_sec",
+      "sprite": "tazer",
+      "baseValue": 100
+    },
+    {
+      "id": "handmade_pistol_frame",
+      "label": "“巢火”紧凑型手枪框架",
+      "atlas": "Items/items_weapons_ranged_energy",
+      "sprite": "handmade_pistol_frame",
+      "baseValue": 88
+    },
+    {
+      "id": "heavy_handmade_pistol_frame",
+      "label": "“铁铸10”手枪框架",
+      "atlas": "Items/items_weapons_ranged_energy",
+      "sprite": "heavy_handmade_pistol_frame",
+      "baseValue": 125
+    },
+    {
+      "id": "furnace",
+      "label": "熔炉",
+      "atlas": "Items/items_tool2",
+      "sprite": "furnace",
+      "baseValue": 200
+    },
+    {
+      "id": "hydroponic",
+      "label": "水培系统",
+      "atlas": "Items/items_hydroponic_plant",
+      "sprite": "hydroponic_off",
+      "baseValue": 300
+    },
+    {
+      "id": "plant_dna_manipulator",
+      "label": "DNA编辑器",
+      "atlas": "Items/items_hydroponic_plant",
+      "sprite": "dna_manipulator",
+      "baseValue": 1000
+    },
+    {
+      "id": "printer",
+      "label": "3D打印机",
+      "atlas": "Items/items_tool2",
+      "sprite": "printer_off",
+      "baseValue": 350
+    },
+    {
+      "id": "deal_maker",
+      "label": "Deal Maker",
+      "atlas": "Items/items_tool",
+      "sprite": "dealmaker",
+      "baseValue": 400
+    },
+    {
+      "id": "recharger",
+      "label": "充能器",
+      "atlas": "Items/items_tool",
+      "sprite": "recharger_base",
+      "baseValue": 150
+    },
+    {
+      "id": "powerblock",
+      "label": "能量阵列",
+      "atlas": "Items/items_tool",
+      "sprite": "powerblock",
+      "baseValue": 200
+    },
+    {
+      "id": "security_alarm",
+      "label": "警报系统",
+      "atlas": "Items/items_tool",
+      "sprite": "alarm_system",
+      "baseValue": 150
+    },
+    {
+      "id": "storage_coordinator",
+      "label": "储物协调器",
+      "atlas": "Items/items_tool",
+      "sprite": "storage_coordinator",
+      "baseValue": 400
+    },
+    {
+      "id": "mirage_projector",
+      "label": "幻影投影仪",
+      "atlas": "Items/items_tool2",
+      "sprite": "projector",
+      "baseValue": 400
+    },
+    {
+      "id": "moisture_farm",
+      "label": "水分收集器",
+      "atlas": "Items/items_tool",
+      "sprite": "moisture_farm",
+      "baseValue": 350
+    },
+    {
+      "id": "water_purifier",
+      "label": "净水器",
+      "atlas": "Items/items_tool2",
+      "sprite": "purifier",
+      "baseValue": 250
+    },
+    {
+      "id": "desequencer",
+      "label": "密码解序器",
+      "atlas": "Items/items_tool",
+      "sprite": "desequencer",
+      "baseValue": 350
+    },
+    {
+      "id": "bottle_printer",
+      "label": "水瓶打印机",
+      "atlas": "Items/items_tool",
+      "sprite": "bottle_printer",
+      "baseValue": 100
+    },
+    {
+      "id": "box_dispenser",
+      "label": "Box Dispenser",
+      "atlas": "Items/items_tool",
+      "sprite": "bottle_printer",
+      "baseValue": 250
+    },
+    {
+      "id": "heating_plate",
+      "label": "加热板",
+      "atlas": "Items/items_tool2",
+      "sprite": "heating_plate",
+      "baseValue": 250
+    },
+    {
+      "id": "blender",
+      "label": "搅拌机",
+      "atlas": "Items/items_tool2",
+      "sprite": "blender",
+      "baseValue": 200
+    },
+    {
+      "id": "evaporator",
+      "label": "蒸发器",
+      "atlas": "Items/items_tool2",
+      "sprite": "evaporator",
+      "baseValue": 300
+    },
+    {
+      "id": "chem_finisher",
+      "label": "化学制剂成型机",
+      "atlas": "Items/items_tool2",
+      "sprite": "chem_finisher",
+      "baseValue": 300
+    },
+    {
+      "id": "wine_rack",
+      "label": "催陈器",
+      "atlas": "Items/items_winemaking",
+      "sprite": "wine_rack",
+      "baseValue": 350
+    },
+    {
+      "id": "fridge",
+      "label": "冰箱",
+      "atlas": "Items/items_ship",
+      "sprite": "fridge",
+      "baseValue": 100
+    },
+    {
+      "id": "smoke_grenade",
+      "label": "烟雾弹",
+      "atlas": "Items/itematlas",
+      "sprite": "small_smoke",
+      "baseValue": 60
+    },
+    {
+      "id": "flashbang_grenade",
+      "label": "闪光弹",
+      "atlas": "Items/itematlas",
+      "sprite": "small_flash",
+      "baseValue": 85
+    },
+    {
+      "id": "c4",
+      "label": "塑性炸药",
+      "atlas": "Items/itematlas",
+      "sprite": "c4",
+      "baseValue": 250
+    },
+    {
+      "id": "c4_set",
+      "label": "塑性炸药（已激活）",
+      "atlas": "Items/itematlas",
+      "sprite": "c4",
+      "baseValue": 250
+    },
+    {
+      "id": "fanny_pack",
+      "label": "腰包",
+      "atlas": "Items/items_backpack2",
+      "sprite": "fanny_pack",
+      "baseValue": 50
+    },
+    {
+      "id": "satchel",
+      "label": "挎包（小）",
+      "atlas": "Items/items_backpack2",
+      "sprite": "satchel",
+      "baseValue": 150
+    },
+    {
+      "id": "kids_backpack",
+      "label": "儿童背包",
+      "atlas": "Items/items_backpack2",
+      "sprite": "junor_backpack1",
+      "baseValue": 200
+    },
+    {
+      "id": "kids_backpack_large",
+      "label": "儿童背包（大）",
+      "atlas": "Items/items_backpack2",
+      "sprite": "junor_backpack2",
+      "baseValue": 250
+    },
+    {
+      "id": "backpack_small",
+      "label": "背包（小）",
+      "atlas": "Items/items_backpack2",
+      "sprite": "simple_backpack",
+      "baseValue": 300
+    },
+    {
+      "id": "backpack_medium",
+      "label": "背包（基础）",
+      "atlas": "Items/items_backpack2",
+      "sprite": "simple_backpack_medium",
+      "baseValue": 450
+    },
+    {
+      "id": "backpack_medium_military",
+      "label": "背包（军用）",
+      "atlas": "Items/items_backpack2",
+      "sprite": "simple_backpack_medium_military",
+      "baseValue": 130
+    },
+    {
+      "id": "backpack_large",
+      "label": "背包（大）",
+      "atlas": "Items/items_backpack2",
+      "sprite": "simple_backpack_large",
+      "baseValue": 650
+    },
+    {
+      "id": "backpack_large_military",
+      "label": "大型军用背包",
+      "atlas": "Items/items_backpack2",
+      "sprite": "simple_backpack_large_military",
+      "baseValue": 280
+    },
+    {
+      "id": "nutrifruit_seed_packet",
+      "label": "一包营养果种子",
+      "atlas": "Items/items_hydroponic_plant",
+      "sprite": "nutrifruit_seed_packet",
+      "baseValue": 1
+    },
+    {
+      "id": "sec_box",
+      "label": "治安部物资箱",
+      "atlas": "Items/items_container",
+      "sprite": "sec_box",
+      "baseValue": 200
+    },
+    {
+      "id": "evidence_box",
+      "label": "治安部物证柜",
+      "atlas": "Items/items_container",
+      "sprite": "evidence_box",
+      "baseValue": 200
+    },
+    {
+      "id": "med_box",
+      "label": "医疗舱物资箱",
+      "atlas": "Items/items_container",
+      "sprite": "med_box",
+      "baseValue": 200
+    },
+    {
+      "id": "eng_box",
+      "label": "工程铸造厂物资箱",
+      "atlas": "Items/items_container",
+      "sprite": "eng_box",
+      "baseValue": 200
+    },
+    {
+      "id": "service_box",
+      "label": "后勤服务部物资箱",
+      "atlas": "Items/items_container",
+      "sprite": "service_box",
+      "baseValue": 175
+    },
+    {
+      "id": "beerCase",
+      "label": "红魔鬼啤酒箱",
+      "atlas": "Items/beer_case",
+      "sprite": "beer_case_0",
+      "baseValue": 1
+    },
+    {
+      "id": "kitchen_knife",
+      "label": "厨刀",
+      "atlas": "Items/items_weapons_melee",
+      "sprite": "kitchen_knife",
+      "baseValue": 45
+    },
+    {
+      "id": "box_cutter",
+      "label": "美工刀",
+      "atlas": "Items/items_weapons_melee",
+      "sprite": "box_cutter",
+      "baseValue": 28
+    },
+    {
+      "id": "combat_knife",
+      "label": "战斗匕首",
+      "atlas": "Items/items_weapons_melee",
+      "sprite": "combat_knife_2",
+      "baseValue": 75
+    },
+    {
+      "id": "kitchen_cleaver",
+      "label": "切肉刀",
+      "atlas": "Items/items_weapons_melee",
+      "sprite": "kitchen_cleaver",
+      "baseValue": 65
+    },
+    {
+      "id": "combat_machete",
+      "label": "战斗砍刀",
+      "atlas": "Items/items_weapons_melee",
+      "sprite": "combat_machete",
+      "baseValue": 185
+    },
+    {
+      "id": "pipe_weapon",
+      "label": "铅管",
+      "atlas": "Items/items_weapons_melee",
+      "sprite": "pipe",
+      "baseValue": 15
+    },
+    {
+      "id": "stun_baton",
+      "label": "眩晕警棍",
+      "atlas": "Items/items_weapons_melee",
+      "sprite": "stun_baton",
+      "baseValue": 165
+    },
+    {
+      "id": "crowbar",
+      "label": "撬棍",
+      "atlas": "Items/items_weapons_melee",
+      "sprite": "crowbar",
+      "baseValue": 75
+    },
+    {
+      "id": "hatchet",
+      "label": "短柄斧",
+      "atlas": "Items/items_weapons_melee",
+      "sprite": "hatchet",
+      "baseValue": 55
+    },
+    {
+      "id": "glass_shard_shiv",
+      "label": "玻璃刀",
+      "atlas": "Items/items_weapons_melee",
+      "sprite": "glass_shard_shiv",
+      "baseValue": 8
+    },
+    {
+      "id": "skinning_knife",
+      "label": "剥皮刀",
+      "atlas": "Items/items_weapons_melee",
+      "sprite": "skinning_knife",
+      "baseValue": 100
+    },
+    {
+      "id": "nuts_metal",
+      "label": "金属螺丝",
+      "atlas": "Items/items_construction",
+      "sprite": "nuts_metal_pile",
+      "baseValue": 14
+    },
+    {
+      "id": "processed_milk",
+      "label": "碳酸代乳",
+      "atlas": "Items/items_food",
+      "sprite": "items_food_pilk_alt",
+      "baseValue": 16
+    },
+    {
+      "id": "processed_juice",
+      "label": "代糖果汁",
+      "atlas": "Items/items_food",
+      "sprite": "items_food_juice",
+      "baseValue": 14
+    },
+    {
+      "id": "processed_meat",
+      "label": "“泥炭”合成肉",
+      "atlas": "Items/items_food",
+      "sprite": "processed_meat",
+      "baseValue": 25
+    },
+    {
+      "id": "bottle_hot_sauce",
+      "label": "辣酱",
+      "atlas": "Items/items_food",
+      "sprite": "hot_sauce",
+      "baseValue": 50
+    },
+    {
+      "id": "bottled_water_premium",
+      "label": "瓶装泉水",
+      "atlas": "Items/items_food",
+      "sprite": "water_bottle_full_premium",
+      "baseValue": 325
+    },
+    {
+      "id": "red_beer",
+      "label": "红魔鬼啤酒",
+      "atlas": "Items/items_food",
+      "sprite": "red_beer",
+      "baseValue": 18
+    },
+    {
+      "id": "empty_beer_bottle",
+      "label": "空啤酒瓶",
+      "atlas": "Items/items_food",
+      "sprite": "empty_beer_bottle",
+      "baseValue": 5
+    },
+    {
+      "id": "bottled_water",
+      "label": "瓶装水（标准）",
+      "atlas": "Items/water_container3",
+      "sprite": "normal",
+      "baseValue": 5
+    },
+    {
+      "id": "small_bottled_water",
+      "label": "瓶装水（小）",
+      "atlas": "Items/water_container3",
+      "sprite": "small",
+      "baseValue": 4
+    },
+    {
+      "id": "mini_bottle",
+      "label": "瓶装水（微型）",
+      "atlas": "Items/water_container3",
+      "sprite": "mini",
+      "baseValue": 3
+    },
+    {
+      "id": "liquid_luck",
+      "label": "液体好运",
+      "atlas": "Items/items_misc",
+      "sprite": "liquid_luck_bottle",
+      "baseValue": 100
+    },
+    {
+      "id": "med_bottle_red",
+      "label": "酸性溶液瓶",
+      "atlas": "Items/items_medical",
+      "sprite": "med_bottle_red",
+      "baseValue": 3
+    },
+    {
+      "id": "med_bottle_blue",
+      "label": "碱性溶液瓶",
+      "atlas": "Items/items_medical",
+      "sprite": "med_bottle_blue",
+      "baseValue": 3
+    },
+    {
+      "id": "med_bottle_violet",
+      "label": "N-羟甲基碱溶液瓶",
+      "atlas": "Items/items_medical",
+      "sprite": "med_bottle_violet",
+      "baseValue": 3
+    },
+    {
+      "id": "med_bottle_orange",
+      "label": "还原剂瓶",
+      "atlas": "Items/items_medical",
+      "sprite": "med_bottle_orange",
+      "baseValue": 3
+    },
+    {
+      "id": "med_bottle_small_pink",
+      "label": "脂合剂瓶",
+      "atlas": "Items/items_medical",
+      "sprite": "med_bottle_small_pink",
+      "baseValue": 3
+    },
+    {
+      "id": "1ml_dropper",
+      "label": "1毫升滴管",
+      "atlas": "Items/water_container3",
+      "sprite": "1ml",
+      "baseValue": 120
+    },
+    {
+      "id": "5ml_dropper",
+      "label": "5毫升滴管",
+      "atlas": "Items/water_container3",
+      "sprite": "5ml",
+      "baseValue": 10
+    },
+    {
+      "id": "25ml_cylinder",
+      "label": "25毫升量筒",
+      "atlas": "Items/water_container3",
+      "sprite": "25ml",
+      "baseValue": 7
+    },
+    {
+      "id": "50ml_cylinder",
+      "label": "50毫升量筒",
+      "atlas": "Items/water_container3",
+      "sprite": "50ml",
+      "baseValue": 10
+    },
+    {
+      "id": "100ml_cylinder",
+      "label": "100毫升量筒",
+      "atlas": "Items/water_container3",
+      "sprite": "100ml",
+      "baseValue": 15
+    },
+    {
+      "id": "large_bottled_water",
+      "label": "瓶装水（大）",
+      "atlas": "Items/water_container3",
+      "sprite": "large",
+      "baseValue": 9
+    },
+    {
+      "id": "water_jug",
+      "label": "桶装水",
+      "atlas": "Items/water_container4",
+      "sprite": "xl",
+      "baseValue": 15
+    },
+    {
+      "id": "soda_red",
+      "label": "汽水",
+      "atlas": "Items/items_food",
+      "sprite": "items_food_soda_red",
+      "baseValue": 15
+    },
+    {
+      "id": "energy_drink",
+      "label": "能量饮料",
+      "atlas": "Items/items_food",
+      "sprite": "energy_drink",
+      "baseValue": 18
+    },
+    {
+      "id": "nudka",
+      "label": "努特加",
+      "atlas": "Items/items_food",
+      "sprite": "nudka",
+      "baseValue": 85
+    },
+    {
+      "id": "galaxy_blend",
+      "label": "繁星果糊",
+      "atlas": "Items/items_food",
+      "sprite": "juice_pouch",
+      "baseValue": 25
+    },
+    {
+      "id": "cat_bar",
+      "label": "猫咪巧克力棒",
+      "atlas": "Items/items_food",
+      "sprite": "cat_bar",
+      "baseValue": 15
+    },
+    {
+      "id": "li_eat_snackbar",
+      "label": "轻食能量棒",
+      "atlas": "Items/items_food",
+      "sprite": "li_eat_snackbar",
+      "baseValue": 17
+    },
+    {
+      "id": "small_raw_meat",
+      "label": "生肉（小）",
+      "atlas": "Items/items_food",
+      "sprite": "small_raw_meat",
+      "baseValue": 65
+    },
+    {
+      "id": "morsel",
+      "label": "一口食物",
+      "atlas": "Items/items_food",
+      "sprite": "morsel",
+      "baseValue": 30
+    },
+    {
+      "id": "small_morsel",
+      "label": "一小口食物",
+      "atlas": "Items/items_food",
+      "sprite": "morsel_small",
+      "baseValue": 15
+    },
+    {
+      "id": "raw_meat",
+      "label": "生肉（标准）",
+      "atlas": "Items/items_food",
+      "sprite": "raw_meat",
+      "baseValue": 159
+    },
+    {
+      "id": "fat_meat",
+      "label": "动物脂肪",
+      "atlas": "Items/items_food",
+      "sprite": "fat_meat",
+      "baseValue": 40
+    },
+    {
+      "id": "meat_scrap",
+      "label": "动物下水",
+      "atlas": "Items/items_food",
+      "sprite": "meat_scrap",
+      "baseValue": 12
+    },
+    {
+      "id": "cup_noodle",
+      "label": "速食拉面",
+      "atlas": "Items/items_food",
+      "sprite": "cup_noodle",
+      "baseValue": 20
+    },
+    {
+      "id": "water_ration",
+      "label": "密封水配给包（标准）",
+      "atlas": "Items/items_food",
+      "sprite": "water_ration",
+      "baseValue": 30
+    },
+    {
+      "id": "water_ration_small",
+      "label": "密封水配给包（小）",
+      "atlas": "Items/items_food",
+      "sprite": "water_ration_small",
+      "baseValue": 15
+    },
+    {
+      "id": "processed_cheese",
+      "label": "合成奶酪",
+      "atlas": "Items/items_food",
+      "sprite": "cheese",
+      "baseValue": 20
+    },
+    {
+      "id": "beis_icecream",
+      "label": "贝氏优质香草冰淇淋",
+      "atlas": "Items/items_food",
+      "sprite": "beis_icecream",
+      "baseValue": 40
+    },
+    {
+      "id": "box_tampon",
+      "label": "一盒帕克斯卫生棉条",
+      "atlas": "Items/items_amenities",
+      "sprite": "box_tampon",
+      "baseValue": 100
+    },
+    {
+      "id": "packet_red_cigarette",
+      "label": "一包海明威香烟",
+      "atlas": "Items/items_amenities",
+      "sprite": "cig_red",
+      "baseValue": 80
+    },
+    {
+      "id": "pack_condom",
+      "label": "一盒瑞克斯避孕套",
+      "atlas": "Items/items_amenities",
+      "sprite": "pack_condom",
+      "baseValue": 35
+    },
+    {
+      "id": "shampoo",
+      "label": "一瓶四合一洗涤剂",
+      "atlas": "Items/items_amenities",
+      "sprite": "shampoo",
+      "baseValue": 30
+    },
+    {
+      "id": "toothpaste",
+      "label": "一支牙膏",
+      "atlas": "Items/items_amenities",
+      "sprite": "toothpaste",
+      "baseValue": 15
+    },
+    {
+      "id": "paper_towel",
+      "label": "一卷纸巾",
+      "atlas": "Items/items_amenities",
+      "sprite": "paper_towel",
+      "baseValue": 35
+    },
+    {
+      "id": "toilet_paper",
+      "label": "一卷厕纸",
+      "atlas": "Items/items_amenities",
+      "sprite": "toilet_paper",
+      "baseValue": 25
+    },
+    {
+      "id": "water_test_container",
+      "label": "水质检测试剂盒",
+      "atlas": "Items/items_amenities",
+      "sprite": "water_test_container",
+      "baseValue": 1
+    },
+    {
+      "id": "water_test_strip",
+      "label": "水质检测试纸",
+      "atlas": "Items/items_amenities",
+      "sprite": "strip_new",
+      "baseValue": 3
+    },
+    {
+      "id": "aquascan",
+      "label": "水质扫描仪",
+      "atlas": "Items/items_amenities",
+      "sprite": "aquascan",
+      "baseValue": 200
+    },
+    {
+      "id": "uv_filter",
+      "label": "紫外线灯",
+      "atlas": "Items/items_amenities",
+      "sprite": "uv",
+      "baseValue": 150
+    },
+    {
+      "id": "metal_scanner",
+      "label": "拾荒扫描仪",
+      "atlas": "Items/items_amenities",
+      "sprite": "metal_scanner",
+      "baseValue": 250
+    },
+    {
+      "id": "gene_scanner",
+      "label": "基因扫描仪",
+      "atlas": "Items/items_amenities",
+      "sprite": "genetic_scanner",
+      "baseValue": 500
+    },
+    {
+      "id": "water_tablet_container",
+      "label": "一瓶净水药片",
+      "atlas": "Items/items_amenities",
+      "sprite": "water_tablet_container",
+      "baseValue": 1
+    },
+    {
+      "id": "water_tablet",
+      "label": "净水药片",
+      "atlas": "Items/items_amenities",
+      "sprite": "water_tablet",
+      "baseValue": 6
+    },
+    {
+      "id": "water_filter",
+      "label": "滤水器",
+      "atlas": "Items/items_amenities",
+      "sprite": "water_filter",
+      "baseValue": 25
+    },
+    {
+      "id": "water_filter_adv",
+      "label": "高级滤水器",
+      "atlas": "Items/items_amenities",
+      "sprite": "water_filter_adv",
+      "baseValue": 350
+    },
+    {
+      "id": "portable_water_purifier",
+      "label": "海德拉科技微型净水器",
+      "atlas": "Items/items_amenities",
+      "sprite": "portable_water_purifier",
+      "baseValue": 325
+    },
+    {
+      "id": "water_pitcher",
+      "label": "水罐",
+      "atlas": "Items/water_container4",
+      "sprite": "pitcher",
+      "baseValue": 25
+    },
+    {
+      "id": "water_tank",
+      "label": "储水罐",
+      "atlas": "Items/items_tool2",
+      "sprite": "water_tank",
+      "baseValue": 350
+    },
+    {
+      "id": "hydroreed_filter",
+      "label": "水培芦苇滤芯",
+      "atlas": "Items/items_hydroponic_plant",
+      "sprite": "hydroreed_filter",
+      "baseValue": 20
+    },
+    {
+      "id": "kotton_fabric",
+      "label": "韧棉织物",
+      "atlas": "Items/items_armor",
+      "sprite": "kotton_fabric",
+      "baseValue": 65
+    },
+    {
+      "id": "nutrient_tablet",
+      "label": "水培营养片",
+      "atlas": "Items/items_hydroponic_plant",
+      "sprite": "nutrient_tablet",
+      "baseValue": 5
+    },
+    {
+      "id": "nutrient_tablet_container",
+      "label": "水培营养片药瓶",
+      "atlas": "Items/items_hydroponic_plant",
+      "sprite": "nutrient_tablet_container",
+      "baseValue": 1
+    },
+    {
+      "id": "lottery_ticket",
+      "label": "彩票",
+      "atlas": "Items/items_amenities",
+      "sprite": "lottery",
+      "baseValue": 25
+    },
+    {
+      "id": "lottery_ticket_old",
+      "label": "旧彩票",
+      "atlas": "Items/items_amenities",
+      "sprite": "lottery_old",
+      "baseValue": 1
+    },
+    {
+      "id": "skincare_cream",
+      "label": "“永恒”焕活精华液",
+      "atlas": "Items/items_amenities",
+      "sprite": "skincare_cream",
+      "baseValue": 500
+    },
+    {
+      "id": "neuroactive_perfume",
+      "label": "“同步”神经活性香水",
+      "atlas": "Items/items_amenities",
+      "sprite": "perfume1",
+      "baseValue": 150
+    },
+    {
+      "id": "self_refilling_neuroactive_perfume",
+      "label": "“同步”自动补充神经活性香水",
+      "atlas": "Items/items_misc",
+      "sprite": "eleanor_perfume",
+      "baseValue": 1000
+    },
+    {
+      "id": "pheromone_perfume",
+      "label": "“本源”费洛蒙香水",
+      "atlas": "Items/items_amenities",
+      "sprite": "perfume2",
+      "baseValue": 200
+    },
+    {
+      "id": "nutrifruit",
+      "label": "营养果",
+      "atlas": "Items/items_hydroponic_plant",
+      "sprite": "nutrifruit",
+      "baseValue": 12
+    },
+    {
+      "id": "nutrifruit_seed",
+      "label": "营养果种子",
+      "atlas": "Items/items_hydroponic_plant",
+      "sprite": "nutrifruit_seed",
+      "baseValue": 40
+    },
+    {
+      "id": "kotton_fiber",
+      "label": "韧棉纤维",
+      "atlas": "Items/items_hydroponic_plant",
+      "sprite": "kotton_plant",
+      "baseValue": 46
+    },
+    {
+      "id": "kotton_seed",
+      "label": "韧棉种子",
+      "atlas": "Items/items_hydroponic_plant",
+      "sprite": "kotton_plant_seed",
+      "baseValue": 20
+    },
+    {
+      "id": "dream_cap",
+      "label": "梦帽菇",
+      "atlas": "Items/items_hydroponic_plant",
+      "sprite": "dream_cap",
+      "baseValue": 23
+    },
+    {
+      "id": "dream_cap_seed",
+      "label": "梦帽菇孢子",
+      "atlas": "Items/items_hydroponic_plant",
+      "sprite": "dream_cap_seed",
+      "baseValue": 24
+    },
+    {
+      "id": "meal_cap",
+      "label": "食用帽菇",
+      "atlas": "Items/items_hydroponic_plant",
+      "sprite": "meal_cap",
+      "baseValue": 19
+    },
+    {
+      "id": "nightmare_cap",
+      "label": "梦魇帽菇",
+      "atlas": "Items/items_hydroponic_plant",
+      "sprite": "nightmare_cap",
+      "baseValue": 26
+    },
+    {
+      "id": "plant_analyser",
+      "label": "植物分析仪",
+      "atlas": "Items/items_hydroponic_plant",
+      "sprite": "plant_analyser",
+      "baseValue": 200
+    },
+    {
+      "id": "coffee_bean",
+      "label": "咖啡豆",
+      "atlas": "Items/items_hydroponic_plant",
+      "sprite": "coffee_bean",
+      "baseValue": 28
+    },
+    {
+      "id": "fillerweed",
+      "label": "填料草",
+      "atlas": "Items/items_hydroponic_plant",
+      "sprite": "fillerweed",
+      "baseValue": 9
+    },
+    {
+      "id": "fillerweed_seed",
+      "label": "填料草种子",
+      "atlas": "Items/items_hydroponic_plant",
+      "sprite": "fillerweed_seed",
+      "baseValue": 9
+    },
+    {
+      "id": "hydroreed_seed",
+      "label": "水培芦苇种子",
+      "atlas": "Items/items_hydroponic_plant",
+      "sprite": "hydroreed_seed",
+      "baseValue": 20
+    },
+    {
+      "id": "bloomberry_seed",
+      "label": "荧光莓种子",
+      "atlas": "Items/items_hydroponic_plant",
+      "sprite": "bloomberry_seed",
+      "baseValue": 40
+    },
+    {
+      "id": "plant_dna_disk",
+      "label": "DNA数据盘",
+      "atlas": "Items/items_hydroponic_plant",
+      "sprite": "dna_disk_black_empty",
+      "baseValue": 140
+    },
+    {
+      "id": "armor_lining",
+      "label": "韧棉衬垫",
+      "atlas": "Items/items_armor",
+      "sprite": "armor_lining",
+      "baseValue": 60
+    },
+    {
+      "id": "metal_ingot",
+      "label": "金属锭",
+      "atlas": "Items/items_material",
+      "sprite": "metal_ingot",
+      "baseValue": 50
+    },
+    {
+      "id": "common_chemical",
+      "label": "化学用品（普通）",
+      "atlas": "Items/items_material",
+      "sprite": "chemical1",
+      "baseValue": 50
+    },
+    {
+      "id": "restricted_chemical",
+      "label": "化学用品（管制）",
+      "atlas": "Items/items_material",
+      "sprite": "chemical2",
+      "baseValue": 100
+    },
+    {
+      "id": "common_medical",
+      "label": "医疗用品（普通）",
+      "atlas": "Items/items_material",
+      "sprite": "med1",
+      "baseValue": 40
+    },
+    {
+      "id": "scrap_metal",
+      "label": "废金属",
+      "atlas": "Items/items_material",
+      "sprite": "scrap_metal",
+      "baseValue": 10
+    },
+    {
+      "id": "junk",
+      "label": "垃圾",
+      "atlas": "Items/items_material",
+      "sprite": "scrap_metal_2",
+      "baseValue": 3
+    },
+    {
+      "id": "common_ore",
+      "label": "金属矿石",
+      "atlas": "Items/items_material",
+      "sprite": "ore1",
+      "baseValue": 15
+    },
+    {
+      "id": "rare_ore",
+      "label": "稀有金属矿石",
+      "atlas": "Items/items_material",
+      "sprite": "ore2",
+      "baseValue": 30
+    },
+    {
+      "id": "common_electronic",
+      "label": "电子元件（普通）",
+      "atlas": "Items/items_material",
+      "sprite": "electronic1",
+      "baseValue": 33
+    },
+    {
+      "id": "rare_electronic",
+      "label": "电子元件（稀有）",
+      "atlas": "Items/items_material",
+      "sprite": "electronic2",
+      "baseValue": 350
+    },
+    {
+      "id": "hypertech_electronic",
+      "label": "电子元件（超科技）",
+      "atlas": "Items/items_material",
+      "sprite": "electronic3",
+      "baseValue": 2500
+    },
+    {
+      "id": "wire",
+      "label": "线缆",
+      "atlas": "Items/items_construction",
+      "sprite": "wire",
+      "baseValue": 16
+    },
+    {
+      "id": "printer_plastic",
+      "label": "3D打印耗材",
+      "atlas": "Items/items_material",
+      "sprite": "printer_plastic",
+      "baseValue": 12
+    },
+    {
+      "id": "flux_agent",
+      "label": "助熔剂（基础）",
+      "atlas": "Items/items_material",
+      "sprite": "flux_agent",
+      "baseValue": 4
+    },
+    {
+      "id": "advanced_flux_agent",
+      "label": "助熔剂（高级）",
+      "atlas": "Items/items_material",
+      "sprite": "flux_agent_advanced",
+      "baseValue": 300
+    },
+    {
+      "id": "gun_part",
+      "label": "枪械零件",
+      "atlas": "Items/items_material",
+      "sprite": "gun_part",
+      "baseValue": 25
+    },
+    {
+      "id": "blank_module",
+      "label": "空白模组",
+      "atlas": "Items/items_module",
+      "sprite": "module_white",
+      "baseValue": 60
+    },
+    {
+      "id": "system_module_performance",
+      "label": "性能模组",
+      "atlas": "Items/items_module",
+      "sprite": "module_red",
+      "baseValue": 70
+    },
+    {
+      "id": "system_module_efficiancy",
+      "label": "效率模组",
+      "atlas": "Items/items_module",
+      "sprite": "module_green",
+      "baseValue": 70
+    },
+    {
+      "id": "system_module_quality",
+      "label": "质量模组",
+      "atlas": "Items/items_module",
+      "sprite": "module_yellow",
+      "baseValue": 70
+    },
+    {
+      "id": "system_module_overclock",
+      "label": "超频模组",
+      "atlas": "Items/items_module",
+      "sprite": "module_red_2",
+      "baseValue": 100
+    },
+    {
+      "id": "system_module_eco",
+      "label": "环保模组",
+      "atlas": "Items/items_module",
+      "sprite": "module_green_2",
+      "baseValue": 100
+    },
+    {
+      "id": "system_module_fineness",
+      "label": "精炼模组",
+      "atlas": "Items/items_module",
+      "sprite": "module_yellow_2",
+      "baseValue": 100
+    },
+    {
+      "id": "system_module_streamlining",
+      "label": "优化模组",
+      "atlas": "Items/items_module",
+      "sprite": "module_green_3",
+      "baseValue": 125
+    },
+    {
+      "id": "system_module_ruined",
+      "label": "报废模组",
+      "atlas": "Items/items_module",
+      "sprite": "module_ruined",
+      "baseValue": 30
+    },
+    {
+      "id": "system_module_corrupt",
+      "label": "损坏模组",
+      "atlas": "Items/items_module",
+      "sprite": "module_corrupt",
+      "baseValue": 45
+    },
+    {
+      "id": "farm_module_nutrifruit",
+      "label": "营养果水培模组",
+      "atlas": "Items/items_module",
+      "sprite": "farm_module_l2",
+      "baseValue": 150
+    },
+    {
+      "id": "farm_module_dream_cap",
+      "label": "梦帽菇中和水培模组",
+      "atlas": "Items/items_module",
+      "sprite": "farm_module_l4",
+      "baseValue": 150
+    },
+    {
+      "id": "farm_module_kotton_loom",
+      "label": "韧棉自动织造水培模组",
+      "atlas": "Items/items_module",
+      "sprite": "farm_module_l1",
+      "baseValue": 200
+    },
+    {
+      "id": "farm_module_nightmare_cap",
+      "label": "梦帽菇梦魇化水培模组",
+      "atlas": "Items/items_module",
+      "sprite": "farm_module5",
+      "baseValue": 150
+    },
+    {
+      "id": "farm_module_fillerweed_production",
+      "label": "填料草增产水培模组",
+      "atlas": "Items/items_module",
+      "sprite": "farm_module_l5",
+      "baseValue": 115
+    },
+    {
+      "id": "farm_module_hydroreed_filter",
+      "label": "水培芦苇滤芯模组",
+      "atlas": "Items/items_module",
+      "sprite": "farm_module_l6",
+      "baseValue": 105
+    },
+    {
+      "id": "farm_module_smuggler",
+      "label": "水培走私模组",
+      "atlas": "Items/items_module",
+      "sprite": "farm_module6",
+      "baseValue": 100
+    },
+    {
+      "id": "evaporator_module_solvent_recovery",
+      "label": "蒸发器溶剂回收模组",
+      "atlas": "Items/items_module",
+      "sprite": "long_module1",
+      "baseValue": 275
+    },
+    {
+      "id": "dna_manipulator_module_stabilizer",
+      "label": "基因稳定模组",
+      "atlas": "Items/items_module",
+      "sprite": "long_module1",
+      "baseValue": 500
+    },
+    {
+      "id": "dna_manipulator_module_positive_filter",
+      "label": "正面特性筛选模组",
+      "atlas": "Items/items_module",
+      "sprite": "long_module1",
+      "baseValue": 500
+    },
+    {
+      "id": "dna_manipulator_module_negative_filter",
+      "label": "负面特性筛选模组",
+      "atlas": "Items/items_module",
+      "sprite": "long_module1",
+      "baseValue": 500
+    },
+    {
+      "id": "dna_manipulator_module_precision",
+      "label": "精准提取模组",
+      "atlas": "Items/items_module",
+      "sprite": "long_module1",
+      "baseValue": 1000
+    },
+    {
+      "id": "printer_module_metal",
+      "label": "金属打印模组",
+      "atlas": "Items/items_module",
+      "sprite": "long_module1",
+      "baseValue": 300
+    },
+    {
+      "id": "system_uncapped_neural_core",
+      "label": "神经核心模组（无限制）",
+      "atlas": "Items/items_module",
+      "sprite": "module_black_5",
+      "baseValue": 1500
+    },
+    {
+      "id": "alarm_module_transmitter",
+      "label": "警报传输模组",
+      "atlas": "Items/items_module",
+      "sprite": "farm_module_l7",
+      "baseValue": 100
+    },
+    {
+      "id": "furnace_module_blast",
+      "label": "熔炉模组（高炉）",
+      "atlas": "Items/items_module",
+      "sprite": "farm_module_l8",
+      "baseValue": 150
+    },
+    {
+      "id": "furnace_module_junk",
+      "label": "熔炉模组（垃圾处理）",
+      "atlas": "Items/items_module",
+      "sprite": "long_module3",
+      "baseValue": 120
+    },
+    {
+      "id": "system_capped_neural_core",
+      "label": "神经核心模组（受限）",
+      "atlas": "Items/items_module",
+      "sprite": "module_black_4",
+      "baseValue": 250
+    },
+    {
+      "id": "crypto_module_sec",
+      "label": "密码解序器芯片（治安）",
+      "atlas": "Items/items_tool",
+      "sprite": "sec_module",
+      "baseValue": 300
+    },
+    {
+      "id": "crypto_module_cmd",
+      "label": "密码解序器芯片（指挥）",
+      "atlas": "Items/items_tool",
+      "sprite": "cmd_module",
+      "baseValue": 350
+    },
+    {
+      "id": "crypto_module_med",
+      "label": "密码解序器芯片（医疗）",
+      "atlas": "Items/items_tool",
+      "sprite": "med_module",
+      "baseValue": 250
+    },
+    {
+      "id": "crypto_module_eng",
+      "label": "密码解序器芯片（工程）",
+      "atlas": "Items/items_tool",
+      "sprite": "eng_module",
+      "baseValue": 250
+    },
+    {
+      "id": "crypto_module_sup",
+      "label": "密码解序器芯片（补给）",
+      "atlas": "Items/items_tool",
+      "sprite": "sup_module",
+      "baseValue": 200
+    },
+    {
+      "id": "crypto_module_ser",
+      "label": "密码解序器芯片（服务）",
+      "atlas": "Items/items_tool",
+      "sprite": "ser_module",
+      "baseValue": 200
+    },
+    {
+      "id": "printer_chip_pistol",
+      "label": ".22手枪3D打印机芯片",
+      "atlas": "Items/items_tool",
+      "sprite": "printer_chip_pistol",
+      "baseValue": 250
+    },
+    {
+      "id": "printer_chip_pistol_double",
+      "label": "3D打印机芯片（.22手枪×2）",
+      "atlas": "Items/items_tool",
+      "sprite": "printer_chip_pistol",
+      "baseValue": 400
+    },
+    {
+      "id": "printer_chip_makeshift_rds",
+      "label": "3D打印机芯片（x4 简易红点瞄准镜）",
+      "atlas": "Items/items_tool",
+      "sprite": "printer_chip2",
+      "baseValue": 200
+    },
+    {
+      "id": "printer_chip_makeshift_toy_laser",
+      "label": "3D打印机芯片（x4 玩具激光笔）",
+      "atlas": "Items/items_tool",
+      "sprite": "printer_chip2",
+      "baseValue": 200
+    },
+    {
+      "id": "printer_chip_small_bottle",
+      "label": "3D打印机芯片（x6 小塑料瓶）",
+      "atlas": "Items/items_tool",
+      "sprite": "printer_chip2",
+      "baseValue": 100
+    },
+    {
+      "id": "printer_chip_internal_springs_improved",
+      "label": "3D打印机芯片（改良内部弹簧组×4）",
+      "atlas": "Items/items_tool",
+      "sprite": "printer_chip2",
+      "baseValue": 150
+    },
+    {
+      "id": "printer_chip_rds",
+      "label": "3D打印机芯片（x2 红点瞄准镜）",
+      "atlas": "Items/items_tool",
+      "sprite": "printer_chip4",
+      "baseValue": 300
+    },
+    {
+      "id": "printer_chip_laser_sight",
+      "label": "3D打印机芯片（x2 激光瞄准器）",
+      "atlas": "Items/items_tool",
+      "sprite": "printer_chip4",
+      "baseValue": 300
+    },
+    {
+      "id": "printer_chip_silencer",
+      "label": "3D打印机芯片（x2 消音器）",
+      "atlas": "Items/items_tool",
+      "sprite": "printer_chip4",
+      "baseValue": 300
+    },
+    {
+      "id": "printer_chip_22_mag",
+      "label": "3D打印机芯片（x2 .22弹匣）",
+      "atlas": "Items/items_tool",
+      "sprite": "printer_chip3",
+      "baseValue": 250
+    },
+    {
+      "id": "printer_chip_22_mag_ext",
+      "label": "3D打印机芯片（x2 加长.22弹匣）",
+      "atlas": "Items/items_tool",
+      "sprite": "printer_chip3",
+      "baseValue": 350
+    },
+    {
+      "id": "printer_chip_22_mag_high",
+      "label": "3D打印机芯片（x2 大容量.22弹匣）",
+      "atlas": "Items/items_tool",
+      "sprite": "printer_chip3",
+      "baseValue": 300
+    },
+    {
+      "id": "printer_chip_10_mag",
+      "label": "3D打印机芯片（x2 10毫米弹匣）",
+      "atlas": "Items/items_tool",
+      "sprite": "printer_chip4",
+      "baseValue": 300
+    },
+    {
+      "id": "printer_chip_10_mag_ext",
+      "label": "3D打印机芯片（x1 加长10毫米弹匣）",
+      "atlas": "Items/items_tool",
+      "sprite": "printer_chip4",
+      "baseValue": 400
+    },
+    {
+      "id": "printer_chip_10_mag_high",
+      "label": "3D打印机芯片（x1 大容量10毫米弹匣）",
+      "atlas": "Items/items_tool",
+      "sprite": "printer_chip4",
+      "baseValue": 350
+    },
+    {
+      "id": "printer_chip_handmade_pistol_frame",
+      "label": "3D打印机芯片（“巢火”紧凑型手枪框架）",
+      "atlas": "Items/items_tool",
+      "sprite": "printer_chip_pistol",
+      "baseValue": 350
+    },
+    {
+      "id": "printer_chip_heavy_handmade_pistol_frame",
+      "label": "3D打印机芯片（“铁铸10”手枪框架）",
+      "atlas": "Items/items_tool",
+      "sprite": "printer_chip_pistol",
+      "baseValue": 450
+    },
+    {
+      "id": "printer_chip_gun_part",
+      "label": "3D打印机芯片（枪械零件）",
+      "atlas": "Items/items_tool",
+      "sprite": "printer_chip_pistol",
+      "baseValue": 300
+    },
+    {
+      "id": "printer_module_cnc",
+      "label": "计算机数控模组",
+      "atlas": "Items/items_module",
+      "sprite": "long_module3",
+      "baseValue": 400
+    },
+    {
+      "id": "printer_chip_box_cutter",
+      "label": "3D打印机芯片（美工刀×3）",
+      "atlas": "Items/items_tool",
+      "sprite": "printer_chip6",
+      "baseValue": 150
+    },
+    {
+      "id": "printer_chip_kitchen_knife",
+      "label": "3D打印机芯片（厨刀×4）",
+      "atlas": "Items/items_tool",
+      "sprite": "printer_chip6",
+      "baseValue": 200
+    },
+    {
+      "id": "printer_chip_hatchet",
+      "label": "3D打印机芯片（短柄斧×4）",
+      "atlas": "Items/items_tool",
+      "sprite": "printer_chip6",
+      "baseValue": 250
+    },
+    {
+      "id": "printer_chip_kitchen_cleaver",
+      "label": "3D打印机芯片（切肉刀×4）",
+      "atlas": "Items/items_tool",
+      "sprite": "printer_chip6",
+      "baseValue": 300
+    },
+    {
+      "id": "printer_chip_combat_knife",
+      "label": "3D打印机芯片（战斗匕首×5）",
+      "atlas": "Items/items_tool",
+      "sprite": "printer_chip6",
+      "baseValue": 380
+    },
+    {
+      "id": "printer_chip_combat_machete",
+      "label": "3D打印机芯片（战斗砍刀×3）",
+      "atlas": "Items/items_tool",
+      "sprite": "printer_chip6",
+      "baseValue": 480
+    },
+    {
+      "id": "printer_module_melee_batch",
+      "label": "近战武器批量打印模组",
+      "atlas": "Items/items_module",
+      "sprite": "long_module2",
+      "baseValue": 250
+    },
+    {
+      "id": "module_extractor",
+      "label": "模组提取器（基础）",
+      "atlas": "Items/items_module",
+      "sprite": "module_extractor",
+      "baseValue": 100
+    },
+    {
+      "id": "module_extractor_advanced",
+      "label": "模组提取器（高级）",
+      "atlas": "Items/items_module",
+      "sprite": "module_extractor_adv",
+      "baseValue": 350
+    },
+    {
+      "id": "module_bay_expansion_kit",
+      "label": "模组舱扩建套件",
+      "atlas": "Items/items_module",
+      "sprite": "hydro_upgrade_kit",
+      "baseValue": 150
+    },
+    {
+      "id": "chem_module",
+      "label": "化学设备模组",
+      "atlas": "Items/items_module",
+      "sprite": "chem_module",
+      "baseValue": 250
+    },
+    {
+      "id": "node_small",
+      "label": "节点（小）",
+      "atlas": "Items/items_module",
+      "sprite": "node_s",
+      "baseValue": 50
+    },
+    {
+      "id": "node_medium",
+      "label": "节点（中）",
+      "atlas": "Items/items_module",
+      "sprite": "node_m",
+      "baseValue": 50
+    },
+    {
+      "id": "makeshift_storage_bay",
+      "label": "简易储藏区",
+      "atlas": "Items/items_ship",
+      "sprite": "storage_bay",
+      "baseValue": 250
+    },
+    {
+      "id": "storage_bay",
+      "label": "储藏区",
+      "atlas": "Items/items_ship",
+      "sprite": "storage_bay",
+      "baseValue": 300
+    },
+    {
+      "id": "storage_bay_large",
+      "label": "储藏区（扩建）",
+      "atlas": "Items/items_ship",
+      "sprite": "storage_bay_large",
+      "baseValue": 850
+    },
+    {
+      "id": "storage_bay_expansion_kit",
+      "label": "储藏区扩建套件",
+      "atlas": "Items/items_tool2",
+      "sprite": "storage_bay_expansion_kit",
+      "baseValue": 1063
+    },
+    {
+      "id": "machine_bay",
+      "label": "机器区",
+      "atlas": "Items/items_tool2",
+      "sprite": "machine_bay0",
+      "baseValue": 300
+    },
+    {
+      "id": "machine_bay_ext",
+      "label": "机器区（扩建）",
+      "atlas": "Items/items_tool2",
+      "sprite": "machine_bay_ext",
+      "baseValue": 1200
+    },
+    {
+      "id": "storage_bay_gun",
+      "label": "枪械师储藏区",
+      "atlas": "Items/items_ship",
+      "sprite": "storage_bay_gun",
+      "baseValue": 400
+    },
+    {
+      "id": "storage_bay_chem",
+      "label": "化学师储藏区",
+      "atlas": "Items/items_ship",
+      "sprite": "storage_bay_chem",
+      "baseValue": 400
+    },
+    {
+      "id": "smuggler_bay_mini",
+      "label": "迷你走私储藏区",
+      "atlas": "Items/items_ship",
+      "sprite": "smuggler_bay_mini",
+      "baseValue": 150
+    },
+    {
+      "id": "smuggler_bay",
+      "label": "走私者暗格",
+      "atlas": "Items/items_ship",
+      "sprite": "smuggler_bay",
+      "baseValue": 250
+    },
+    {
+      "id": "smuggler_bay_mod",
+      "label": "走私者暗格（改进）",
+      "atlas": "Items/items_ship",
+      "sprite": "smuggler_bay_large",
+      "baseValue": 400
+    },
+    {
+      "id": "hypertech_bay",
+      "label": "超科技储藏区",
+      "atlas": "Items/items_tool2",
+      "sprite": "hypertech_bay",
+      "baseValue": 10000
+    },
+    {
+      "id": "screwdriver",
+      "label": "螺丝刀",
+      "atlas": "Items/items_tool",
+      "sprite": "screwdriver_s",
+      "baseValue": 25
+    },
+    {
+      "id": "welder",
+      "label": "等离子切割机",
+      "atlas": "Items/items_tool",
+      "sprite": "welder_s",
+      "baseValue": 80
+    },
+    {
+      "id": "wire_cutter",
+      "label": "剪线钳",
+      "atlas": "Items/items_tool",
+      "sprite": "wirecutter",
+      "baseValue": 40
+    },
+    {
+      "id": "toolbox",
+      "label": "工具箱",
+      "atlas": "Items/items_tool2",
+      "sprite": "toolbox_old",
+      "baseValue": 150
+    },
+    {
+      "id": "labeler",
+      "label": "标签打印机",
+      "atlas": "Items/items_tool",
+      "sprite": "labeler",
+      "baseValue": 50
+    },
+    {
+      "id": "labeler_blue",
+      "label": "蓝色标签打印机",
+      "atlas": "Items/items_tool",
+      "sprite": "labeler_blue",
+      "baseValue": 50
+    },
+    {
+      "id": "intake_hopper",
+      "label": "进料斗",
+      "atlas": "Items/items_tool",
+      "sprite": "hopper_in",
+      "baseValue": 300
+    },
+    {
+      "id": "outlet_hopper",
+      "label": "出料斗",
+      "atlas": "Items/items_tool",
+      "sprite": "hopper_out",
+      "baseValue": 300
+    },
+    {
+      "id": "magnifier",
+      "label": "放大镜",
+      "atlas": "Items/items_tool",
+      "sprite": "magnifier",
+      "baseValue": 50
+    },
+    {
+      "id": "turbo_booster",
+      "label": "一次性涡轮增压器",
+      "atlas": "Items/items_tool",
+      "sprite": "turbo_booster",
+      "baseValue": 35
+    },
+    {
+      "id": "turbo_booster_adv",
+      "label": "高级涡轮增压器",
+      "atlas": "Items/items_tool",
+      "sprite": "turbo_booster_adv",
+      "baseValue": 300
+    },
+    {
+      "id": "turbo_booster_hypertech",
+      "label": "超科技涡轮增压器",
+      "atlas": "Items/items_tool2",
+      "sprite": "turbo_booster_hypertech",
+      "baseValue": 15000
+    },
+    {
+      "id": "mind_reprogrammer",
+      "label": "心智重编程器",
+      "atlas": "Items/items_tool",
+      "sprite": "mind_reprogrammer",
+      "baseValue": 5000
+    },
+    {
+      "id": "sign_water",
+      "label": "水霓虹灯牌",
+      "atlas": "Items/items_sign",
+      "sprite": "water_sign",
+      "baseValue": 100
+    },
+    {
+      "id": "sign_food",
+      "label": "食品霓虹灯牌",
+      "atlas": "Items/items_sign",
+      "sprite": "food_sign",
+      "baseValue": 100
+    },
+    {
+      "id": "sign_medical",
+      "label": "医疗霓虹灯牌",
+      "atlas": "Items/items_sign",
+      "sprite": "medical_sign",
+      "baseValue": 200
+    },
+    {
+      "id": "sign_household",
+      "label": "日用品霓虹灯牌",
+      "atlas": "Items/items_sign",
+      "sprite": "household_sign",
+      "baseValue": 100
+    },
+    {
+      "id": "sign_material",
+      "label": "材料霓虹灯牌",
+      "atlas": "Items/items_sign",
+      "sprite": "material_sign",
+      "baseValue": 100
+    },
+    {
+      "id": "sign_ruined_machine",
+      "label": "Scrap Machine Sign",
+      "atlas": "Items/items_sign",
+      "sprite": "material_sign",
+      "baseValue": 100
+    },
+    {
+      "id": "sign_firearm",
+      "label": "枪械霓虹灯牌",
+      "atlas": "Items/items_sign",
+      "sprite": "gun_sign",
+      "baseValue": 100
+    },
+    {
+      "id": "sign_firearm_heavy",
+      "label": "重型枪械霓虹灯牌",
+      "atlas": "Items/items_sign",
+      "sprite": "gun_sign2",
+      "baseValue": 200
+    },
+    {
+      "id": "sign_berry",
+      "label": "Translation Error 'item_sign_berry_name' in Item",
+      "atlas": "Items/items_sign",
+      "sprite": "berry_sign",
+      "baseValue": 100
+    },
+    {
+      "id": "xray_scanner",
+      "label": "便携式X射线扫描仪",
+      "atlas": "Items/items_tool",
+      "sprite": "spectral_analyser",
+      "baseValue": 400
+    },
+    {
+      "id": "sign_expedition",
+      "label": "探险招募牌",
+      "atlas": "Items/items_sign",
+      "sprite": "hiring_sign",
+      "baseValue": 50
+    },
+    {
+      "id": "rds",
+      "label": "红点瞄准镜",
+      "atlas": "Items/items_mod",
+      "sprite": "rds_item",
+      "baseValue": 60
+    },
+    {
+      "id": "rds_makeshift",
+      "label": "简易红点瞄准镜",
+      "atlas": "Items/items_mod",
+      "sprite": "rds_makeshift_item",
+      "baseValue": 25
+    },
+    {
+      "id": "silencer",
+      "label": "消音器",
+      "atlas": "Items/items_mod",
+      "sprite": "silencer_item",
+      "baseValue": 55
+    },
+    {
+      "id": "silencer2",
+      "label": "夜枭消音器",
+      "atlas": "Items/items_mod",
+      "sprite": "silencer2_item",
+      "baseValue": 90
+    },
+    {
+      "id": "silencer_makeshift",
+      "label": "简易消音器",
+      "atlas": "Items/items_mod",
+      "sprite": "bottle_item",
+      "baseValue": 15
+    },
+    {
+      "id": "barrel",
+      "label": "外接式加长枪管",
+      "atlas": "Items/items_mod",
+      "sprite": "barrel_item",
+      "baseValue": 60
+    },
+    {
+      "id": "compensator",
+      "label": "补偿器",
+      "atlas": "Items/items_mod",
+      "sprite": "compensator_item",
+      "baseValue": 50
+    },
+    {
+      "id": "mag_10mm",
+      "label": "10毫米弹匣",
+      "atlas": "Items/items_mod",
+      "sprite": "10mm_mag_item",
+      "baseValue": 30
+    },
+    {
+      "id": "mag_10mm_high",
+      "label": "大容量10毫米弹匣",
+      "atlas": "Items/items_mod",
+      "sprite": "10mm_mag_high_item",
+      "baseValue": 40
+    },
+    {
+      "id": "mag_10mm_ext",
+      "label": "加长10毫米弹匣",
+      "atlas": "Items/items_mod",
+      "sprite": "10mm_mag_ext_item",
+      "baseValue": 50
+    },
+    {
+      "id": "mag_22",
+      "label": ".22弹匣",
+      "atlas": "Items/items_mod",
+      "sprite": "22_mag_item",
+      "baseValue": 15
+    },
+    {
+      "id": "mag_22_high",
+      "label": "大容量.22弹匣",
+      "atlas": "Items/items_mod",
+      "sprite": "22_mag_high_item",
+      "baseValue": 25
+    },
+    {
+      "id": "mag_22_ext",
+      "label": "加长.22弹匣",
+      "atlas": "Items/items_mod",
+      "sprite": "22_mag_ext_item",
+      "baseValue": 35
+    },
+    {
+      "id": "mag_10mm_smg",
+      "label": "10毫米冲锋枪弹匣",
+      "atlas": "Items/items_mod",
+      "sprite": "10mm_mag_smg_item",
+      "baseValue": 55
+    },
+    {
+      "id": "mag_10mm_smg_high",
+      "label": "大容量10毫米冲锋枪弹匣",
+      "atlas": "Items/items_mod",
+      "sprite": "10mm_mag_smg_high_item",
+      "baseValue": 70
+    },
+    {
+      "id": "mag_10mm_smg_box",
+      "label": "10毫米冲锋枪箱式弹匣",
+      "atlas": "Items/items_mod",
+      "sprite": "10mm_mag_smg_box_item",
+      "baseValue": 85
+    },
+    {
+      "id": "laser",
+      "label": "激光瞄准器",
+      "atlas": "Items/items_mod",
+      "sprite": "laser_item",
+      "baseValue": 50
+    },
+    {
+      "id": "laser2",
+      "label": "目标捕获装置",
+      "atlas": "Items/items_mod",
+      "sprite": "laser2_item",
+      "baseValue": 100
+    },
+    {
+      "id": "laser_toy",
+      "label": "玩具激光笔",
+      "atlas": "Items/items_mod",
+      "sprite": "laser_toy_item",
+      "baseValue": 18
+    },
+    {
+      "id": "bipod",
+      "label": "两脚架",
+      "atlas": "Items/items_mod",
+      "sprite": "bipod_item",
+      "baseValue": 40
+    },
+    {
+      "id": "gl",
+      "label": "25毫米下挂式榴弹发射器",
+      "atlas": "Items/items_mod",
+      "sprite": "gl_item",
+      "baseValue": 150
+    },
+    {
+      "id": "grip",
+      "label": "前握把",
+      "atlas": "Items/items_mod",
+      "sprite": "grip_item",
+      "baseValue": 40
+    },
+    {
+      "id": "stock",
+      "label": "“守护者”枪托",
+      "atlas": "Items/items_mod",
+      "sprite": "stock_item",
+      "baseValue": 40
+    },
+    {
+      "id": "short_stock",
+      "label": "“小圆盾”枪托",
+      "atlas": "Items/items_mod",
+      "sprite": "short_stock_item",
+      "baseValue": 35
+    },
+    {
+      "id": "internal_springs",
+      "label": "高耐久内部弹簧组",
+      "atlas": "Items/items_mod",
+      "sprite": "special_mod",
+      "baseValue": 40
+    },
+    {
+      "id": "internal_springs_improved",
+      "label": "改良内部弹簧组",
+      "atlas": "Items/items_mod",
+      "sprite": "special_mod1",
+      "baseValue": 20
+    },
+    {
+      "id": "trigger_group",
+      "label": "精调扳机组",
+      "atlas": "Items/items_mod",
+      "sprite": "special_mod",
+      "baseValue": 50
+    },
+    {
+      "id": "match_barrel",
+      "label": "比赛级枪管",
+      "atlas": "Items/items_mod",
+      "sprite": "special_mod",
+      "baseValue": 75
+    },
+    {
+      "id": "pistol_switch",
+      "label": "手枪自动阻铁",
+      "atlas": "Items/items_mod",
+      "sprite": "special_mod",
+      "baseValue": 40
+    },
+    {
+      "id": "ammo_display",
+      "label": "弹药显示器",
+      "atlas": "Items/items_mod",
+      "sprite": "special_mod",
+      "baseValue": 70
+    },
+    {
+      "id": "grip_gel",
+      "label": "触感记忆握把凝胶",
+      "atlas": "Items/items_mod",
+      "sprite": "special_mod",
+      "baseValue": 70
+    },
+    {
+      "id": "animal_cage",
+      "label": "动物笼",
+      "atlas": "Items/items_husbandry",
+      "sprite": "animal_cage",
+      "baseValue": 250
+    },
+    {
+      "id": "livestock_feed_dispenser",
+      "label": "牲畜饲料分配器",
+      "atlas": "Items/items_husbandry",
+      "sprite": "animal_feeder",
+      "baseValue": 300
+    },
+    {
+      "id": "auto_butcher",
+      "label": "自动屠宰机",
+      "atlas": "Items/items_tool2",
+      "sprite": "gibber",
+      "baseValue": 400
+    },
+    {
+      "id": "marking_pen",
+      "label": "标记笔",
+      "atlas": "Items/items_husbandry",
+      "sprite": "marking_pen",
+      "baseValue": 50
+    },
+    {
+      "id": "vacuum_robot",
+      "label": "清洁机器人",
+      "atlas": "Items/items_husbandry",
+      "sprite": "vacuum_robot",
+      "baseValue": 250
+    },
+    {
+      "id": "serum_red",
+      "label": "牲畜类固醇血清",
+      "atlas": "Items/items_medical",
+      "sprite": "red_serum",
+      "baseValue": 100
+    },
+    {
+      "id": "serum_green",
+      "label": "牲畜免疫血清",
+      "atlas": "Items/items_medical",
+      "sprite": "green_serum",
+      "baseValue": 100
+    },
+    {
+      "id": "mouse_trap",
+      "label": "捕鼠夹",
+      "atlas": "Items/items_husbandry",
+      "sprite": "mouse_trap",
+      "baseValue": 50
+    },
+    {
+      "id": "ras",
+      "label": "循环水养殖系统",
+      "atlas": "Items/items_aquaculture",
+      "sprite": "ras_empty",
+      "baseValue": 300
+    },
+    {
+      "id": "tilapia_roe",
+      "label": "罗非鱼卵",
+      "atlas": "Items/items_aquaculture",
+      "sprite": "roe",
+      "baseValue": 30
+    },
+    {
+      "id": "gutter_tilapia_roe",
+      "label": "阴沟罗非鱼卵",
+      "atlas": "Items/items_aquaculture",
+      "sprite": "roe3",
+      "baseValue": 15
+    },
+    {
+      "id": "graft_tilapia_roe",
+      "label": "植皮罗非鱼卵",
+      "atlas": "Items/items_aquaculture",
+      "sprite": "roe2",
+      "baseValue": 60
+    },
+    {
+      "id": "tilapia_skin_graft",
+      "label": "罗非鱼植皮片",
+      "atlas": "Items/items_medical",
+      "sprite": "bandage_fish",
+      "baseValue": 24
+    },
+    {
+      "id": "tiny_fish_fillet",
+      "label": "鱼肉片（极小）",
+      "atlas": "Items/items_aquaculture",
+      "sprite": "meat_fish_tiny4",
+      "baseValue": 13
+    },
+    {
+      "id": "fish_scrap",
+      "label": "鱼类边角料",
+      "atlas": "Items/items_aquaculture",
+      "sprite": "fishscrap",
+      "baseValue": 4
+    },
+    {
+      "id": "small_fish_fillet",
+      "label": "鱼肉片（小）",
+      "atlas": "Items/items_aquaculture",
+      "sprite": "meat_fish_small4",
+      "baseValue": 26
+    },
+    {
+      "id": "fish_fillet",
+      "label": "鱼肉片",
+      "atlas": "Items/items_aquaculture",
+      "sprite": "meat_fish4",
+      "baseValue": 57
+    },
+    {
+      "id": "large_fish_fillet",
+      "label": "鱼肉片（大）",
+      "atlas": "Items/items_aquaculture",
+      "sprite": "meat_fish_large4",
+      "baseValue": 143
+    },
+    {
+      "id": "gutterflow_pellet",
+      "label": "污泥饲料粒",
+      "atlas": "Items/items_aquaculture",
+      "sprite": "fish_food",
+      "baseValue": 40
+    },
+    {
+      "id": "industrial_fish_feed",
+      "label": "工业鱼饲料",
+      "atlas": "Items/items_aquaculture",
+      "sprite": "fish_food2",
+      "baseValue": 100
+    },
+    {
+      "id": "small_eel_fillet",
+      "label": "鳗鱼肉片（小）",
+      "atlas": "Items/items_aquaculture",
+      "sprite": "meat_eel_tiny",
+      "baseValue": 68
+    },
+    {
+      "id": "eel_fillet",
+      "label": "鳗鱼肉片",
+      "atlas": "Items/items_aquaculture",
+      "sprite": "meat_eel_small",
+      "baseValue": 136
+    },
+    {
+      "id": "caviar",
+      "label": "鱼子酱",
+      "atlas": "Items/items_aquaculture",
+      "sprite": "caviar",
+      "baseValue": 240
+    },
+    {
+      "id": "sturgeon_roe",
+      "label": "鲟鱼卵",
+      "atlas": "Items/items_aquaculture",
+      "sprite": "roe_sturgeon",
+      "baseValue": 120
+    },
+    {
+      "id": "wine_yeast",
+      "label": "酵母",
+      "atlas": "Items/items_winemaking",
+      "sprite": "yeast",
+      "baseValue": 10
+    },
+    {
+      "id": "wine_superyeast",
+      "label": "超级酵母",
+      "atlas": "Items/items_winemaking",
+      "sprite": "superyeast",
+      "baseValue": 20
+    },
+    {
+      "id": "wine_yeast_red",
+      "label": "合成酵母",
+      "atlas": "Items/items_winemaking",
+      "sprite": "illegal_yeast",
+      "baseValue": 8
+    },
+    {
+      "id": "wine_yeast_infinite",
+      "label": "酵母生物反应器",
+      "atlas": "Items/items_winemaking",
+      "sprite": "yeast_gen",
+      "baseValue": 250
+    },
+    {
+      "id": "wine_bottle",
+      "label": "酒瓶",
+      "atlas": "Items/items_winemaking",
+      "sprite": "wine_bottle",
+      "baseValue": 12
+    },
+    {
+      "id": "wine_berry",
+      "label": "荧光莓",
+      "atlas": "Items/items_winemaking",
+      "sprite": "wine_berry",
+      "baseValue": 14
+    }
+  ]
+}

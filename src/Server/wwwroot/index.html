@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="zh-CN">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>可能是赌的 · 联机服务测试</title><link rel="stylesheet" href="/style.css"><script src="/app.js" defer></script></head>
+<body>
+<main>
+  <header><div><p class="eyebrow" id="server-build">可能是赌的 / SERVER</p><h1>可能是赌的 · 联机测试</h1></div><span id="status" role="status">尚未登录</span><button id="logout" type="button" hidden>退出账号</button></header>
+  <p class="intro">玩家各开一个页面，用同一房间码入座；斗地主和麻将可添加人机。此页验证服务端通信，使用独立测试筹码。</p>
+  <section id="login" class="panel"><h2>登录 / 注册</h2><p id="auth-status" class="subtle" role="status">正在检查登录服务…</p><form id="login-form"><label>用户名<input id="username" maxlength="24" autocomplete="username" placeholder="字母/数字/_，4–24位"></label><label>密码<input id="password" type="password" maxlength="128" autocomplete="current-password" placeholder="至少 10 位"></label><label>昵称（注册时填写）<input id="name" maxlength="20" autocomplete="nickname" value="店主"></label><button id="login-submit">登录</button><button id="register" type="button">注册账号</button><button id="steam-login" type="button">Steam 登录</button><button id="guest-login" type="button" hidden>访客测试</button></form><p class="subtle">Steam 登录会打开 Valve 官方授权页，授权完成后自动进入大厅。</p></section>
+  <section id="directory" class="panel" hidden><h2>公共大厅 <small id="online-count"></small></h2><label>玩家筛选<select id="player-filter"><option value="all">全部玩家</option><option value="steam">Steam 登录</option><option value="nonSteam">非 Steam 登录</option></select></label><div class="lobby-grid"><div><h3>在场玩家</h3><div id="online-players"></div></div><div><h3>公开房间</h3><div id="public-rooms"></div></div></div><h3>收到的邀请</h3><div id="invitations"></div><details><summary>隐私设置</summary><label><input id="allow-visits" type="checkbox">允许串门（店铺画面由游戏端提供）</label><label><input id="allow-invites" type="checkbox" checked>接收牌局邀请</label></details><details><summary>聊天</summary><div id="chat-history" role="log"></div><form id="chat-form"><label>消息<input id="chat-text" maxlength="120" autocomplete="off"></label><button>发送</button></form></details></section>
+  <section id="lobby" class="panel" hidden><h2>开房间 / 加入房间</h2><div class="lobby-grid"><form id="create-form">
+    <label>玩法<select id="game"><option value="stud">五张梭哈</option><option value="three">炸金花</option><option value="holdem">德州扑克 · 底注桌</option><option value="blackjack">二十一点 · 轮庄桌</option><option value="landlord">三人斗地主</option><option value="mahjong">四人货栈麻将</option><option value="dice">骰盅 · 轮庄</option></select></label>
+    <label>房间名称<input id="room-name" maxlength="30" placeholder="我的牌桌"></label><label><input id="public" type="checkbox" checked>公开房间（私人房间取消勾选）</label>
+    <label>底注<input id="ante" type="number" min="1" max="20000" value="100" required></label><label>每人带入<input id="buy-in" type="number" min="10" max="1000000" value="10000" required></label><button>开房间</button></form><form id="join-form"><label>房间码<input id="room-code" maxlength="8" required placeholder="8 位房间码" autocomplete="off"></label><button>加入房间</button></form></div></section>
+  <section id="table" hidden>
+    <div class="table-header"><div><span class="subtle">房间码</span> <strong id="code"></strong> <button id="copy-code" class="quiet">复制</button></div><span id="round"></span><button id="leave" class="quiet">离开牌桌</button></div>
+    <div class="felt">
+      <section class="seat"><div id="other-name" class="seat-name"></div><div id="other-cards" class="cards" aria-label="对手的牌"></div><div id="other-balance" class="balance"></div></section>
+      <div id="board-cards" class="cards" aria-label="公共牌" hidden></div><div class="pot"><small>底池</small><strong id="pot">0</strong><span id="turn"></span></div>
+      <section class="seat"><div id="own-name" class="seat-name"></div><div id="own-cards" class="cards" aria-label="你的牌"></div><div id="own-balance" class="balance"></div></section>
+    </div>
+    <div id="result" role="status" hidden></div>
+    <div id="actions" class="actions"></div>
+    <label id="amount-wrap" hidden>下注 / 加注的本次投入<input id="amount" type="number" min="1" step="1"><small>跟注、弃牌和全押使用按钮上显示的金额。</small></label>
+    <details class="panel"><summary>查看本桌规则</summary><p id="mode-rules"></p><p>全押只投入双方能匹配的金额，主动离开按本手判负结算。服务端统一发牌，隐藏的底牌只发给本人。双方都准备才开始下一手。</p><p>对方掉线时暂停并保留座位。私人房间不列在公开列表中，邀请保留两分钟。服务重启会清除本次测试房间。</p></details>
+    <details class="panel"><summary>牌局记录</summary><ol id="events"></ol></details>
+  </section>
+  <p id="message" aria-live="polite"></p>
+  <footer>服务端测试工具 · 游戏内界面由赌场模组提供 · 当前筹码仅用于联机测试</footer>
+</main>
+</body></html>
+
+
+

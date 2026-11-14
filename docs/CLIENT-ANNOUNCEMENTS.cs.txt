@@ -1,0 +1,46 @@
+using System;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+using NightStud.Shared;
+using TMPro;
+
+namespace NightStud {
+    public sealed partial class ModEntry {
+        ServerNotice onlineAnnouncement;string onlineAnnouncementOrigin="";int onlineAnnouncementPage;
+        static string NoticeTimestamp(JToken value){
+            if(value is JValue raw){if(raw.Value is DateTime time)return new DateTimeOffset(time).ToString("O");if(raw.Value is DateTimeOffset offset)return offset.ToString("O");}
+            return (string)value;
+        }
+        void ReceiveAnnouncement(JObject frame){
+            var data=frame["announcement"] as JObject;
+            if(data==null){onlineAnnouncement=null;onlineAnnouncementOrigin=onlineServer;}
+            else if(ServerNotice.TryCreate((string)data["id"],(string)data["title"],(string)data["body"],NoticeTimestamp(data["updatedAt"]),out var notice)){onlineAnnouncement=notice;onlineAnnouncementOrigin=onlineServer;onlineAnnouncementPage=0;}
+            else return;
+            if(PlayerStore.HasInstance)ModHelper.SetModData(Id,"online.serverNotice",new JObject{{"server",onlineServer},{"announcement",data}}.ToString(Formatting.None));
+        }
+        ServerNotice CurrentAnnouncement(){
+            if(onlineAnnouncementOrigin==onlineServer)return onlineAnnouncement;
+            onlineAnnouncement=null;onlineAnnouncementOrigin=onlineServer;
+            if(PlayerStore.HasInstance)try{
+                var cached=JObject.Parse(ModHelper.GetModData(Id,"online.serverNotice","{}"));var data=cached["announcement"] as JObject;
+                if((string)cached["server"]==onlineServer&&data!=null)ServerNotice.TryCreate((string)data["id"],(string)data["title"],(string)data["body"],NoticeTimestamp(data["updatedAt"]),out onlineAnnouncement);
+            }catch(JsonException){}
+            return onlineAnnouncement;
+        }
+        void DrawOnlineAnnouncement(){
+            TMP_Text Plain(string words,int y,int h,int size=15){var label=HallText(words,220,y,512,h,size);label.richText=false;label.text=words;return label;}
+            Plain("服务器公告",108,32,22);HallRule(478,142,520);
+            OnlineButton("返回",678,108,105,()=>OnlineHallTab(0));
+            var notice=CurrentAnnouncement();
+            if(notice==null){Plain(onlineConnected?"当前服务器还没有发布公告。":"暂无已保存的服务器公告。",229,80,17);Plain("公告仅展示服务器服主发布的文字消息。",326,45,13);return;}
+            Plain(notice.Title,168,35,20);
+            string date=DateTimeOffset.Parse(notice.UpdatedAt).ToLocalTime().ToString("yyyy-MM-dd HH:mm");
+            Plain("来自当前服务器服主 · "+date+(onlineConnected?"":" · 上次保存"),201,25,11);
+            const int chunk=240;int pages=Math.Max(1,(notice.Body.Length+chunk-1)/chunk);onlineAnnouncementPage=Math.Max(0,Math.Min(pages-1,onlineAnnouncementPage));int start=onlineAnnouncementPage*chunk;
+            var body=Plain(notice.Body.Substring(start,Math.Min(chunk,notice.Body.Length-start)),294,150,15);body.alignment=TextAlignmentOptions.TopLeft;
+            if(onlineAnnouncementPage>0)OnlineButton("上一页",310,385,145,()=>{onlineAnnouncementPage--;OnlineDraw();});
+            if(onlineAnnouncementPage+1<pages)OnlineButton("下一页",644,385,145,()=>{onlineAnnouncementPage++;OnlineDraw();});
+            Plain((onlineAnnouncementPage+1)+" / "+pages,385,24,12).alignment=TextAlignmentOptions.Center;
+        }
+    }
+}

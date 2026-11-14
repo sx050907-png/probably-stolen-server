@@ -1,0 +1,27 @@
+name: Publish downloadable server
+on:
+  push:
+    tags: ['v*']
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  package:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-dotnet@v6
+        with:
+          dotnet-version: '10.0.x'
+      - name: Verify service recovery
+        run: dotnet run --project src/ServiceTests/NightStud.ServiceTests.csproj -c Release -- work/release-service src/Server/bin/Release/net10.0/NightStud.Server.dll
+      - name: Build portable downloads
+        run: python3 scripts/package.py --output release
+      - name: Publish release
+        if: startsWith(github.ref, 'refs/tags/')
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh release create "$GITHUB_REF_NAME" release/* --verify-tag --title "可能是赌的服务端 $GITHUB_REF_NAME" --notes-file docs/RELEASE.md

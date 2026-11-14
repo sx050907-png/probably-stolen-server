@@ -1,0 +1,26 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <InvariantGlobalization>true</InvariantGlobalization>
+    <AssemblyName>NightStud.Server</AssemblyName>
+    <Version>0.6.9</Version>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="../Shared/WagerRules.cs" Link="WagerRules.cs" />
+    <Compile Include="../Shared/ServerNotice.cs" Link="ServerNotice.cs" />
+    <EmbeddedResource Include="stake-catalogue.json" />
+    <EmbeddedResource Include="shop-art.json" />
+    <EmbeddedResource Include="shop-catalogue.json" />
+    <Compile Include="../Rules/Landlord.cs;../Rules/Mahjong.cs;../Rules/MahjongOnlineRules.cs;../Rules/RiichiHand.cs" Link="Rules/%(Filename)%(Extension)" />
+    <Compile Include="../Shared/PreviewImage.cs" Link="PreviewImage.cs" />
+    <Compile Include="../Shared/ShopScene.cs" Link="ShopScene.cs" />
+    <Compile Include="../Shared/ShopProjection.cs" Link="ShopProjection.cs" />
+    <Compile Include="../Shared/VisitLooks.cs" Link="VisitLooks.cs" />
+    <Compile Include="../Shared/AssetBetRules.cs" Link="AssetBetRules.cs" />
+    <Compile Include="../Shared/GamePayloadBudget.cs" Link="GamePayloadBudget.cs" />
+    <PackageReference Include="Certes" Version="4.1.0" />
+    <PackageReference Include="Microsoft.Data.Sqlite" Version="10.0.15" />
+  </ItemGroup>
+</Project>
