@@ -37,6 +37,7 @@ with tempfile.TemporaryDirectory(prefix='simpfun start ',dir=work) as temporary:
     with socket.socket() as port_socket:port_socket.bind(('127.0.0.1',0));port=port_socket.getsockname()[1]
     environment=dict(os.environ,SERVER_PORT=str(port),NIGHTSTUD_DATA_DIR=str(target/'data'),NIGHTSTUD_LOG_DIR=str(target/'logs'))
     environment.pop('NIGHTSTUD_MAINTENANCE',None)
+    environment.pop('NIGHTSTUD_WEB_TEST_UI',None)
     def entry():
         (target/'start.sh').write_text((repository/'deploy/start.sh').read_text('utf-8').replace(remote,base),'utf-8')
     def spawn():return subprocess.Popen(['bash','start.sh'],cwd=target,env=environment,stdin=subprocess.DEVNULL,stdout=subprocess.PIPE,stderr=subprocess.STDOUT,start_new_session=True)
@@ -54,8 +55,15 @@ with tempfile.TemporaryDirectory(prefix='simpfun start ',dir=work) as temporary:
             except Exception:time.sleep(.1)
         raise AssertionError('No server health: '+stop(process)[-2000:])
     try:
-        entry();process,health=run();stop(process)
-        check(health['version']=='0.6.11','start.sh downloads and starts the published server with no console input')
+        entry();process,health=run()
+        check(health['version']=='0.6.12','start.sh downloads and starts the published server with no console input')
+        check(all((target/'app/wwwroot'/name).is_file() for name in ('index.html','app.js','style.css')),'deployed archive contains actual test files for default-off verification')
+        for route in ('/','/index.html','/app.js','/style.css'):
+            try:
+                with urllib.request.urlopen('http://127.0.0.1:'+str(port)+route,timeout=2) as response:status=response.status
+            except urllib.error.HTTPError as error:status=error.code
+            check(status==404,'published server blocks browser test UI '+route)
+        stop(process)
         check(all(digest(p)==v for p,v in protected.items()),'bootstrap preserves configuration and operator data')
         check(not list(target.glob('.install-*')),'installer staging is removed before the persistent service starts')
         before=len(downloads);process,health=run();stop(process)

@@ -23,6 +23,7 @@ builder.Logging.AddFilter("Microsoft.AspNetCore", LogLevel.Warning);
 builder.WebHost.ConfigureKestrel(options => { options.AddServerHeader = false; options.Limits.MaxRequestBodySize = 4096; });
 bool legacy=Environment.GetEnvironmentVariable("NIGHTSTUD_ALLOW_LEGACY_LOGIN")=="1";
 bool guest=Environment.GetEnvironmentVariable("NIGHTSTUD_ALLOW_GUEST")=="1";
+bool webTestUi=Environment.GetEnvironmentVariable("NIGHTSTUD_WEB_TEST_UI")=="1";
 var key=legacy?ServerConfig.AccessKey():"";
 string dataDirectory=Environment.GetEnvironmentVariable("NIGHTSTUD_DATA_DIR")??Path.Combine(AppContext.BaseDirectory,"..","data");
 var accounts=new Accounts(dataDirectory);var moderation=new Moderation(dataDirectory);
@@ -77,8 +78,9 @@ app.Use(async(context,next)=>{
     await next();
 });
 app.UseWebSockets(new WebSocketOptions { KeepAliveInterval = TimeSpan.FromSeconds(20), KeepAliveTimeout = TimeSpan.FromSeconds(20) });
-app.UseDefaultFiles();
-app.UseStaticFiles();
+// Default-off also covers web files left behind by earlier overlay installations.
+// Native game APIs and Steam callbacks do not depend on this optional test UI.
+if(webTestUi){app.UseDefaultFiles();app.UseStaticFiles();}
 app.MapGet("/health", () => Results.Json(hub.Status()));
 app.MapGet("/api/announcements",()=>Results.Json(new{announcement=hub.Announcement}));
 AuthRoutes.Map(app,accounts,steam,hub,moderation,guest);
@@ -137,7 +139,7 @@ var sweeper = Task.Run(async () => {
     } }
     catch (OperationCanceledException) { }
 });
-app.Logger.LogInformation("NightStud server {Version} / protocol {Protocol}; accounts; practice/store stakes; steamOpenId={Steam}; guest={Guest}; reconnect {Seconds}s", ServerBuild.Version, Wire.Version, steam.Enabled,guest,grace);
+app.Logger.LogInformation("NightStud server {Version} / protocol {Protocol}; accounts; practice/store stakes; steamOpenId={Steam}; guest={Guest}; webTestUi={WebTestUi}; reconnect {Seconds}s", ServerBuild.Version, Wire.Version, steam.Enabled,guest,webTestUi,grace);
 await app.RunAsync();
 await sweeper;
 

@@ -2,7 +2,7 @@
 
 《深空当铺 / Probably Stolen》社区模组“可能是赌的”的开源服务端。提供公共大厅、私人房间、七种牌局、串门、柜台交易，以及账号、日志和钱货暂存。玩家可以连接服主自建的服务器。
 
-客户端兼容：核心 **0.49.0**、联机组件 **0.6.4**。服务端 **0.6.11**，协议版本 1。MIT 许可；依赖许可见 THIRD-PARTY。仓库不包含游戏程序、贴图、音乐、私人账号数据库或正式服务器配置。
+客户端兼容：核心 **0.49.0**、联机组件 **0.6.4**。服务端 **0.6.12**，协议版本 1。MIT 许可；依赖许可见 THIRD-PARTY。仓库不包含游戏程序、贴图、音乐、私人账号数据库或正式服务器配置。
 
 ## 一键安装
 
@@ -36,6 +36,14 @@ bash install.sh --dir "$PWD/ProbablyStolenServer" --port 17266
 **公告**：通过文件管理将根目录 `announcement.example.json` 复制到 `data/announcement.json`，编辑标题、正文和更新时间。ID 可用 `notice-1` 等字母、数字、短横线组合；更新时间保留示例的完整格式。运行中约一秒读取，不需要输入命令。撤下公告时删除 `data/announcement.json`。
 
 **维护**：将 `service-status.example.json` 复制到 `data/service-status.json`，把 `status` 改为 `maintenance` 并填写 `message`。恢复服务时改回 `online`；正式停止服务的通知使用 `closed`。运行中约一秒读取。维护通知先保存生效，再停止实例。
+
+## 浏览器测试界面与托管范围
+
+网页测试大厅默认关闭，`/`、`/index.html`、`/app.js`、`/style.css` 返回 404。即使旧版网页文件仍在 app/wwwroot 中，也不会开放。游戏客户端使用的账号、房间、牌局、串门、聊天、公告和状态接口继续提供服务；Steam 登录所需的跳转与回调保留。
+
+简幻欢部署保持 `NIGHTSTUD_WEB_TEST_UI=0`（未配置时同样关闭）。其服务清单禁止与游戏服务器无关的通用网站；本程序的游戏联机后端及 Steam 回调是否获准，应向平台确认。关闭网页测试界面不等同于获得平台批准，也不要在实例上另行搭建官网、通用网站或代理服务。
+
+仅在允许网页应用的自建环境排查问题时，可在 config.env 显式设置 `NIGHTSTUD_WEB_TEST_UI=1` 并重启，临时打开浏览器测试大厅。游戏端无需这个设置。公网账号登录仍要求 HTTPS，开关不会降低认证和限流要求。
 
 ## 更新与数据
 
@@ -81,6 +89,6 @@ dotnet run --project src/ServiceTests/NightStud.ServiceTests.csproj -c Release -
 python3 scripts/package.py --output release
 ```
 
-服务测试会启动隔离的本机 TCP 服务器，验证维护通知、公告只读、重连间隔、重启登录恢复，以及钱货恢复不重复。更多规则、认证和交易测试位于 `src/*Tests`。
+服务测试会启动隔离的本机 TCP 服务器，验证网页默认关闭与显式启用、原生登录及 WebSocket、维护通知、公告只读、重连间隔、重启登录恢复，以及钱货恢复不重复。更多规则、认证和交易测试位于 `src/*Tests`。
 
 CI 在 Windows 与 Linux 验证，标签发布生成两个平台的完整包、一键安装器与 SHA256SUMS。问题反馈时附版本、时间和去除账号口令的日志；不要上传数据库、证书或私人配置。
