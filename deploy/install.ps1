@@ -37,7 +37,7 @@ try{
         Copy-Item -LiteralPath (Join-Path $installRoot 'app') -Destination $backup -Recurse
         foreach($name in @('start.cmd','start.ps1','start.sh')){if(Test-Path -LiteralPath (Join-Path $installRoot $name)){Copy-Item -LiteralPath (Join-Path $installRoot $name) -Destination $backup}}
     }
-    foreach($name in @('app','THIRD-PARTY','start.cmd','start.ps1','start.sh','config.env.example','README.md','LICENSE')){
+    foreach($name in @('app','THIRD-PARTY','start.cmd','start.ps1','start.sh','config.env.example','announcement.example.json','service-status.example.json','README.md','LICENSE')){
         $source=Join-Path $unpacked $name;if(Test-Path -LiteralPath $source){Copy-Item -LiteralPath $source -Destination $installRoot -Recurse -Force}
     }
     $config=Join-Path $installRoot 'config.env'

@@ -23,11 +23,11 @@ install_dir=$(cd -- "$install_dir" && pwd -P)
 [[ $install_dir != / ]] || { echo 'Choose a dedicated folder.' >&2; exit 1; }
 if command -v pgrep >/dev/null && pgrep -f -- "^$install_dir/app/NightStud.Server([[:space:]]|$)" >/dev/null; then echo 'Stop this server before updating.' >&2; exit 1; fi
 stage=$(mktemp -d "$install_dir/.install-XXXXXXXX")
-cleanup(){ [[ $stage == "$install_dir"/.install-* && -d $stage ]] && rm -rf -- "$stage"; }
+cleanup(){ if [[ $stage == "$install_dir"/.install-* && -d $stage ]]; then rm -rf -- "$stage"; fi; }
 trap cleanup EXIT
 asset=nightstud-server-linux-x64.tar.gz
-curl --fail --location --retry 2 "$release_base/SHA256SUMS" --output "$stage/SHA256SUMS"
-curl --fail --location --retry 2 "$release_base/$asset" --output "$stage/$asset"
+curl --fail --location --retry 2 --connect-timeout 15 --max-time 60 "$release_base/SHA256SUMS" --output "$stage/SHA256SUMS"
+curl --fail --location --retry 2 --connect-timeout 15 --max-time 600 "$release_base/$asset" --output "$stage/$asset"
 expected=$(awk -v name="$asset" '$2==name {print $1}' "$stage/SHA256SUMS")
 [[ $expected =~ ^[a-fA-F0-9]{64}$ ]] || { echo 'Missing release checksum.' >&2; exit 1; }
 printf '%s  %s\n' "$expected" "$stage/$asset" | sha256sum --check --status || { echo 'Download checksum mismatch; existing files preserved.' >&2; exit 1; }
@@ -40,7 +40,7 @@ if [[ -d $install_dir/app ]]; then
   backup="$install_dir/backups/install-$(date -u +%Y%m%d-%H%M%S)-${RANDOM}"
   mkdir -p -- "$backup"; cp -a -- "$install_dir/app" "$backup/"
 fi
-for name in app THIRD-PARTY start.cmd start.ps1 start.sh config.env.example README.md LICENSE; do
+for name in app THIRD-PARTY start.cmd start.ps1 start.sh config.env.example announcement.example.json service-status.example.json README.md LICENSE; do
   [[ ! -e $stage/unpacked/$name ]] || cp -a -- "$stage/unpacked/$name" "$install_dir/"
 done
 if [[ ! -f $install_dir/config.env ]]; then
@@ -48,6 +48,9 @@ if [[ ! -f $install_dir/config.env ]]; then
   printf 'NIGHTSTUD_PORT=%s\nNIGHTSTUD_SCHEME=http\nNIGHTSTUD_ALLOW_GUEST=%s\nNIGHTSTUD_ALLOW_LEGACY_LOGIN=0\nNIGHTSTUD_RECONNECT_SECONDS=90\n' "$install_port" "$guest_test" > "$install_dir/config.env"
 fi
 chmod u+x "$install_dir/start.sh" "$install_dir/app/NightStud.Server"
+if [[ -f $install_dir/update.request ]]; then rm -- "$install_dir/update.request"; fi
 echo "Installed: $install_dir"
 echo 'Existing config.env, data and certificates were preserved. Public account login requires HTTPS; --guest-test is an explicit private testing option.'
-if ((start_after)); then bash "$install_dir/start.sh"; fi
+cleanup
+trap - EXIT
+if ((start_after)); then exec bash "$install_dir/start.sh"; fi

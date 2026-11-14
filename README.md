@@ -2,7 +2,7 @@
 
 《深空当铺 / Probably Stolen》社区模组“可能是赌的”的开源服务端。提供公共大厅、私人房间、七种牌局、串门、柜台交易，以及账号、日志和钱货暂存。玩家可以连接服主自建的服务器。
 
-客户端兼容：核心 **0.49.0**、联机组件 **0.6.4**。服务端 **0.6.10**，协议版本 1。MIT 许可；依赖许可见 THIRD-PARTY。仓库不包含游戏程序、贴图、音乐、私人账号数据库或正式服务器配置。
+客户端兼容：核心 **0.49.0**、联机组件 **0.6.4**。服务端 **0.6.11**，协议版本 1。MIT 许可；依赖许可见 THIRD-PARTY。仓库不包含游戏程序、贴图、音乐、私人账号数据库或正式服务器配置。
 
 ## 一键安装
 
@@ -23,7 +23,19 @@ bash install.sh --dir "$PWD/ProbablyStolenServer" --port 17266
 
 完整包自带 .NET 运行时。`--no-start` / `-NoStart` 只安装；私下测试时可以显式加 `--guest-test` / `-GuestTest` 开启访客。访客默认关闭，账号密码和 Steam 登录通过 HTTPS；本机 loopback 允许 HTTP。公网域名、证书和端口放行取决于服主环境，安装器不会修改防火墙或系统服务。
 
-简幻欢 Linux AIO 可以直接上传 Linux 完整包，启动命令为 `bash start.sh`。平台提供的 `SERVER_PORT` 优先于备用 `NIGHTSTUD_PORT`。首次将 `config.env.example` 复制为 `config.env`；示例中的公开域名须换成服主自己的地址。
+## 简幻欢 Linux AIO：统一从 start.sh 启动
+
+简幻欢依靠 `/home/container/start.sh` 启动。服务控制台不能输入 Shell 命令，也不要求用户修改面板启动命令。上面的手动命令适用于其他具有 Shell 的主机。
+
+**首次安装**：在 Releases 下载单独的 `start.sh`，通过文件管理上传到 `/home/container/start.sh`，点击面板“启动”。脚本检测到缺少程序后，会下载安装器、校验完整包并启动服务。GitHub 连通性取决于实例；下载失败会保留现有文件并显示错误，也可以通过文件管理上传 Linux 完整包。
+
+**已有服务器更新**：停服，备份原 `start.sh`，上传新版 `start.sh`；在同目录新建一个空文件 `update.request`，再点击“启动”。更新成功后删除这个标记，再进入正常服务；没有标记且程序已存在时不会访问 GitHub。`data`、`config.env` 和证书保留。平台的 `SERVER_PORT` 优先于备用端口。
+
+**备份**：停服，在根目录新建空文件 `backup.request` 后点击“启动”。`start.sh` 会先生成 SQLite 一致性备份，成功后删除标记并启动服务；失败时保留标记并显示错误。备份位于 `backups`，还需另行保管配置、词库和证书。
+
+**公告**：通过文件管理将根目录 `announcement.example.json` 复制到 `data/announcement.json`，编辑标题、正文和更新时间。ID 可用 `notice-1` 等字母、数字、短横线组合；更新时间保留示例的完整格式。运行中约一秒读取，不需要输入命令。撤下公告时删除 `data/announcement.json`。
+
+**维护**：将 `service-status.example.json` 复制到 `data/service-status.json`，把 `status` 改为 `maintenance` 并填写 `message`。恢复服务时改回 `online`；正式停止服务的通知使用 `closed`。运行中约一秒读取。维护通知先保存生效，再停止实例。
 
 ## 更新与数据
 
@@ -37,7 +49,7 @@ bash install.sh --dir "$PWD/ProbablyStolenServer" --port 17266
 
 ## 维护、停服与公告
 
-在安装目录执行；Windows 使用 `app\NightStud.Server.exe`：
+以下命令只适用于有 Shell 的其他主机，在安装目录执行；Windows 使用 `app\NightStud.Server.exe`。简幻欢请使用上面的文件管理流程：
 
 ```bash
 ./app/NightStud.Server announce '周六维护预告' '服务器将在 20:00 维护，请先结束牌局并取回暂存。'

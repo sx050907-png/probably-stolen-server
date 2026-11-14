@@ -17,7 +17,7 @@ for runtime in ('linux-x64','win-x64'):
     entries={}
     for file in app.rglob('*'):
         if file.is_file() and file.suffix!='.pdb':entries['app/'+file.relative_to(app).as_posix()]=file
-    for name in ('start.cmd','start.ps1','start.sh','config.env.example'):entries[name]=root/'deploy'/name
+    for name in ('start.cmd','start.ps1','start.sh','config.env.example','announcement.example.json','service-status.example.json'):entries[name]=root/'deploy'/name
     for name in ('README.md','LICENSE'):entries[name]=root/name
     for file in (root/'THIRD-PARTY').rglob('*'):
         if file.is_file():entries['THIRD-PARTY/'+file.relative_to(root/'THIRD-PARTY').as_posix()]=file
@@ -31,7 +31,7 @@ for runtime in ('linux-x64','win-x64'):
     else:
         with zipfile.ZipFile(output/('nightstud-server-'+runtime+'.zip'),'w',zipfile.ZIP_DEFLATED,compresslevel=4) as archive:
             for name,file in sorted(entries.items()):archive.write(file,name)
-for name in ('install.sh','install.ps1'):shutil.copy2(root/'deploy'/name,output/name)
+for name in ('install.sh','install.ps1','start.sh'):shutil.copy2(root/'deploy'/name,output/name)
 with zipfile.ZipFile(output/'nightstud-server-installer-windows.zip','w',zipfile.ZIP_DEFLATED) as archive:
     for name in ('install.cmd','install.ps1'):archive.write(root/'deploy'/name,name)
     archive.write(root/'README.md','README.md')

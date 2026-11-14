@@ -20,6 +20,8 @@ jobs:
         run: dotnet run --project src/ServiceTests/NightStud.ServiceTests.csproj -c Release -- work/release-service src/Server/bin/Release/net10.0/NightStud.Server.dll
       - name: Build portable downloads
         run: python3 scripts/package.py --output release
+      - name: Verify Simpfun start.sh-only install and update
+        run: python3 scripts/test-start-entry.py --release release
       - name: Publish release
         if: startsWith(github.ref, 'refs/tags/')
         env:
