@@ -23,11 +23,13 @@ try{
     $matchesFound=@(Get-Content -LiteralPath (Join-Path $stage 'SHA256SUMS') | Where-Object {$_ -match $pattern})
     if($matchesFound.Count -ne 1){throw 'Missing or ambiguous release checksum.'}
     [void]($matchesFound[0] -match $pattern);$expected=$Matches[1]
-    if((Get-FileHash -LiteralPath (Join-Path $stage $asset) -Algorithm SHA256).Hash -ne $expected){throw 'Download checksum mismatch. Existing installation was preserved.'}
+    $sha256=[Security.Cryptography.SHA256]::Create();$download=[IO.File]::OpenRead((Join-Path $stage $asset))
+    try{$actual=[BitConverter]::ToString($sha256.ComputeHash($download)).Replace('-','')}finally{$download.Dispose();$sha256.Dispose()}
+    if($actual -ne $expected){throw 'Download checksum mismatch. Existing installation was preserved.'}
     Add-Type -AssemblyName System.IO.Compression.FileSystem
     $archive=[IO.Compression.ZipFile]::OpenRead((Join-Path $stage $asset))
     try{foreach($entry in $archive.Entries){if($entry.FullName -match '(^[/\\]|(^|[/\\])\.\.([/\\]|$)|:)'){throw 'Invalid archive path.'}}}finally{$archive.Dispose()}
-    $unpacked=Join-Path $stage 'unpacked';Expand-Archive -LiteralPath (Join-Path $stage $asset) -DestinationPath $unpacked
+    $unpacked=Join-Path $stage 'unpacked';[IO.Compression.ZipFile]::ExtractToDirectory((Join-Path $stage $asset),$unpacked)
     if(!(Test-Path -LiteralPath (Join-Path $unpacked 'app/NightStud.Server.exe'))){throw 'Server executable missing from release.'}
     if(Test-Path -LiteralPath (Join-Path $installRoot 'app')){
         $backup=Join-Path $installRoot ('backups/install-'+(Get-Date -Format yyyyMMdd-HHmmss)+'-'+[Guid]::NewGuid().ToString('N').Substring(0,6))
