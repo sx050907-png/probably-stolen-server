@@ -202,3 +202,10 @@ refreshToken 为随机 selector.secret，数据库仅存 secret 的 SHA256，30 
 `tableVoice` 能力允许 `tablePhrase` 的 `move` 为 `say:wait`、`say:coffee`、`say:nice`、`say:partner`、`say:show`、`say:seventeen`、`say:ready`。发送者必须已入当前正在进行的斗地主房间，code 和 revision 一致；可在非本人回合发送。全桌 8 秒冷却，自动 wait 仍验证当前行动者、20 秒静置和 35 秒冷却。
 
 广播 tablePhrase 包含 id、code、hand、phrase、speaker（服务端确定的座位）、manual。不改变牌局 revision。只广播给本桌在线席位。客户端按同一 speaker 选择音色，不随 ownSeat 改变。任意文本、文件、路径均拒绝。旧服没有该能力时，客户端显示更新提示。
+
+
+## 0.7.2：按玩法提供快捷语，3秒冷却
+
+新能力 `tableVoiceAllModes` 表示手动短句适用于七种牌局，且全桌冷却为3秒。保留 `tableVoice` 兼容原斗地主入口。自动催牌仍只用于斗地主。
+
+斗地主可用 wait/coffee/nice/partner/show/seventeen/ready；stud、three、holdem、blackjack、mahjong 可用 wait/nice/show/ready；dice 只可用 wait/show。不符合当前玩法的代号返回 bad_phrase。消息与响应字段不变；发话座位来自服务端，不能由客户端指定。

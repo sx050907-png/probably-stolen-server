@@ -5,10 +5,11 @@
     <Nullable>enable</Nullable>
     <InvariantGlobalization>true</InvariantGlobalization>
     <AssemblyName>NightStud.Server</AssemblyName>
-    <Version>0.7.1</Version>
+    <Version>0.7.2</Version>
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="../Shared/WagerRules.cs" Link="WagerRules.cs" />
+    <Compile Include="../Shared/TableVoiceRules.cs" Link="TableVoiceRules.cs" />
     <Compile Include="../Shared/ServerNotice.cs" Link="ServerNotice.cs" />
     <EmbeddedResource Include="stake-catalogue.json" />
     <EmbeddedResource Include="shop-art.json" />

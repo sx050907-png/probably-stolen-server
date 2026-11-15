@@ -23,30 +23,46 @@ async Task Start(){
 async Task Stop(){if(server!=null){if(!server.HasExited){server.Kill(true);await server.WaitForExitAsync();}server.Dispose();server=null;}}
 async Task<JsonElement> Request(string path,object body){using var response=await http.PostAsJsonAsync(path,body);string text=await response.Content.ReadAsStringAsync();Check(response.IsSuccessStatusCode,path+": "+text);using var json=JsonDocument.Parse(text);return json.RootElement.Clone();}
 async Task<Peer> Login(string user){var result=await Request("api/auth/login",new{username=user,password="contact-test-password"});return await Peer.Connect(address,result.GetProperty("token").GetString()!,result.GetProperty("playerId").GetString()!);}
-Peer? a=null,b=null,c=null,d=null;
-async Task<JsonElement> Table(Peer peer,string kind,Dictionary<string,object?>? payload=null){payload??=new();var room=peer.Last("state").GetProperty("room");payload["code"]=room.GetProperty("code").GetString();payload["revision"]=room.GetProperty("revision").GetInt64();return await peer.Do(kind,payload);}
+var peers=new List<Peer>();
+async Task<JsonElement> Table(Peer peer,string kind,Dictionary<string,object?>? payload=null){
+ payload??=new();var room=peer.Last("state").GetProperty("room");
+ payload["code"]=room.GetProperty("code").GetString();payload["revision"]=room.GetProperty("revision").GetInt64();return await peer.Do(kind,payload);
+}
 try{
- await Start();foreach(string user in new[]{"voice_tcp_a","voice_tcp_b","voice_tcp_c","voice_tcp_d"})await Request("api/auth/register",new{username=user,password="contact-test-password",name=user});
- a=await Login("voice_tcp_a");b=await Login("voice_tcp_b");c=await Login("voice_tcp_c");d=await Login("voice_tcp_d");
- Check(a.Last("welcome").GetProperty("features").EnumerateArray().Any(f=>f.GetString()=="tableVoice"),"packaged TCP server advertises tableVoice");
- await a.Do("create",new(){["game"]="landlord",["public"]=true});string code=a.Last("state").GetProperty("room").GetProperty("code").GetString()!;
- await b.Do("join",new(){["code"]=code});await c.Do("join",new(){["code"]=code});await Table(a,"ready");await Table(b,"ready");await Table(c,"ready");
- var room=a.Last("state").GetProperty("room");Check(room.GetProperty("phase").GetString()=="playing","three actual WebSocket clients start landlord");
- var peers=new[]{a,b,c};int actor=room.GetProperty("actor").GetInt32();int speaker=(actor+1)%3;long revision=room.GetProperty("revision").GetInt64();
- var accepted=await Table(peers[speaker],"tablePhrase",new(){["move"]="say:coffee"});Check(accepted.GetProperty("ok").GetBoolean(),"off-turn player can manually send coffee over actual TCP");
- foreach(var p in peers){var phrase=await p.Wait(f=>f.GetProperty("type").GetString()=="tablePhrase");Check(phrase.GetProperty("speaker").GetInt32()==speaker&&phrase.GetProperty("phrase").GetString()=="coffee"&&phrase.GetProperty("manual").GetBoolean(),"every peer receives the same authoritative speaker and phrase");}
- Check(d.Count("tablePhrase")==0,"outside socket receives no table phrase");
- var rate=await Table(peers[actor],"tablePhrase",new(){["move"]="say:wait"});Check(!rate.GetProperty("ok").GetBoolean()&&rate.GetProperty("error").GetString()=="phrase_rate","real network room cooldown rejects cross-player spam");
- var path=await Table(peers[speaker],"tablePhrase",new(){["move"]="say:../../external.ogg"});Check(!path.GetProperty("ok").GetBoolean()&&path.GetProperty("error").GetString()=="bad_phrase","actual socket cannot inject arbitrary audio paths");
- var wrong=await peers[speaker].Do("tablePhrase",new(){["code"]="OTHER",["revision"]=revision,["move"]="say:coffee"});Check(!wrong.GetProperty("ok").GetBoolean()&&wrong.GetProperty("error").GetString()=="stale","actual socket cannot address another room");
- Check(a.Last("state").GetProperty("room").GetProperty("revision").GetInt64()==revision,"voice exchange leaves gameplay revision unchanged");
- var text="PASS "+checks+" actual TCP/WebSocket checks against packaged server 0.7.1; authenticated local test accounts; no official server or Steam friend used.";
- File.WriteAllText(Path.Combine(directory,"success.txt"),text);Console.WriteLine(text);
-}finally{if(a!=null)await a.DisposeAsync();if(b!=null)await b.DisposeAsync();if(c!=null)await c.DisposeAsync();if(d!=null)await d.DisposeAsync();await Stop();File.WriteAllLines(Path.Combine(directory,"server-console.log"),log);}
+ await Start();foreach(string user in new[]{"voice_tcp_a","voice_tcp_b","voice_tcp_c","voice_tcp_d","voice_tcp_e"}){
+  await Request("api/auth/register",new{username=user,password="contact-test-password",name=user});peers.Add(await Login(user));
+ }
+ Check(peers[0].Last("welcome").GetProperty("features").EnumerateArray().Any(f=>f.GetString()=="tableVoiceAllModes"),"TCP server advertises contextual voice and 3-second cooldown");
+ foreach(string mode in new[]{"landlord","stud","three","holdem","blackjack","mahjong","dice"}){
+  int capacity=mode=="landlord"?3:mode=="mahjong"?4:2;var seated=peers.Take(capacity).ToArray();var outside=peers[4];
+  Check((await seated[0].Do("create",new(){["game"]=mode,["public"]=true})).GetProperty("ok").GetBoolean(),"create "+mode);
+  string code=seated[0].Last("state").GetProperty("room").GetProperty("code").GetString()!;
+  foreach(var p in seated.Skip(1))Check((await p.Do("join",new(){["code"]=code})).GetProperty("ok").GetBoolean(),"join "+mode);
+  foreach(var p in seated)Check((await Table(p,"ready")).GetProperty("ok").GetBoolean(),"ready "+mode);
+  var room=seated[0].Last("state").GetProperty("room");Check(room.GetProperty("phase").GetString()=="playing","real WebSocket peers start "+mode);
+  File.WriteAllText(Path.Combine(directory,mode+"-playing.json"),seated[0].Last("state").GetRawText());
+  int actor=room.GetProperty("actor").GetInt32(),speaker=(actor+1)%capacity;long revision=room.GetProperty("revision").GetInt64();string phrase=mode=="landlord"?"coffee":"show";
+  Check((await Table(seated[speaker],"tablePhrase",new(){["move"]="say:"+phrase})).GetProperty("ok").GetBoolean(),"off-turn manual voice accepted "+mode);
+  foreach(var p in seated){
+   var received=await p.Wait(f=>f.GetProperty("type").GetString()=="tablePhrase"&&f.GetProperty("code").GetString()==code);
+   Check(received.GetProperty("speaker").GetInt32()==speaker&&received.GetProperty("phrase").GetString()==phrase&&received.GetProperty("manual").GetBoolean(),"all table peers agree on speaker and phrase "+mode);
+  }
+  Check(outside.Count("tablePhrase")==0,"outside socket receives no table voice "+mode);
+  var rate=await Table(seated[actor],"tablePhrase",new(){["move"]="say:wait"});Check(!rate.GetProperty("ok").GetBoolean()&&rate.GetProperty("error").GetString()=="phrase_rate","sub-three-second spam blocked "+mode);
+  string invalid=mode=="landlord"?"../../external.ogg":mode=="dice"?"ready":"seventeen";
+  var bad=await Table(seated[speaker],"tablePhrase",new(){["move"]="say:"+invalid});Check(!bad.GetProperty("ok").GetBoolean()&&bad.GetProperty("error").GetString()=="bad_phrase","inapplicable phrase or external path rejected "+mode);
+  await Task.Delay(3100);
+  Check((await Table(seated[speaker],"tablePhrase",new(){["move"]="say:wait"})).GetProperty("ok").GetBoolean(),"voice available after three seconds "+mode);
+  Check(seated[0].Last("state").GetProperty("room").GetProperty("revision").GetInt64()==revision,"quick voice never changes gameplay revision "+mode);
+  foreach(var p in seated)await Table(p,"leave");
+ }
+ string proof="PASS "+checks+" real TCP/WebSocket checks across all 7 modes: contextual phrases, authenticated speaker, table-only delivery and 3-second cooldown. Local test accounts only.";
+ File.WriteAllText(Path.Combine(directory,"success.txt"),proof);Console.WriteLine(proof);
+}finally{foreach(var p in peers)await p.DisposeAsync();await Stop();File.WriteAllLines(Path.Combine(directory,"server-console.log"),log);}
 
 sealed class Peer:IAsyncDisposable {
  readonly ClientWebSocket socket=new();readonly CancellationTokenSource stop=new();Task pump=Task.CompletedTask;readonly ConcurrentQueue<JsonElement> frames=new();public string Id="";
- public static async Task<Peer> Connect(string address,string token,string id){var p=new Peer{Id=id};await p.socket.ConnectAsync(new Uri(address.Replace("http:","ws:")+"/ws"),p.stop.Token);p.pump=p.Pump();await p.Send(new{type="hello",protocol=1,token,capabilities=new[]{"contacts"},games=new[]{"stud","landlord","mahjong"}});await p.Wait(f=>f.GetProperty("type").GetString()=="welcome");return p;}
+ public static async Task<Peer> Connect(string address,string token,string id){var p=new Peer{Id=id};await p.socket.ConnectAsync(new Uri(address.Replace("http:","ws:")+"/ws"),p.stop.Token);p.pump=p.Pump();await p.Send(new{type="hello",protocol=1,token,capabilities=new[]{"contacts"},games=new[]{"stud","three","holdem","blackjack","landlord","mahjong","dice"}});await p.Wait(f=>f.GetProperty("type").GetString()=="welcome");return p;}
  async Task Pump(){try{var buffer=new byte[4096];while(!stop.IsCancellationRequested){using var body=new MemoryStream();WebSocketReceiveResult frame;do{frame=await socket.ReceiveAsync(buffer,stop.Token);if(frame.MessageType==WebSocketMessageType.Close)return;body.Write(buffer,0,frame.Count);if(body.Length>131072)throw new Exception("oversize frame");}while(!frame.EndOfMessage);using var json=JsonDocument.Parse(body.ToArray());frames.Enqueue(json.RootElement.Clone());}}catch(Exception e)when(e is OperationCanceledException or WebSocketException or ObjectDisposedException){}}
  Task Send(object value)=>socket.SendAsync(Encoding.UTF8.GetBytes(JsonSerializer.Serialize(value)),WebSocketMessageType.Text,true,stop.Token);
  public JsonElement Last(string type)=>frames.LastOrDefault(f=>f.GetProperty("type").GetString()==type);
