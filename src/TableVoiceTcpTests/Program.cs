@@ -25,8 +25,15 @@ async Task<JsonElement> Request(string path,object body){using var response=awai
 async Task<Peer> Login(string user){var result=await Request("api/auth/login",new{username=user,password="contact-test-password"});return await Peer.Connect(address,result.GetProperty("token").GetString()!,result.GetProperty("playerId").GetString()!);}
 var peers=new List<Peer>();
 async Task<JsonElement> Table(Peer peer,string kind,Dictionary<string,object?>? payload=null){
- payload??=new();var room=peer.Last("state").GetProperty("room");
- payload["code"]=room.GetProperty("code").GetString();payload["revision"]=room.GetProperty("revision").GetInt64();return await peer.Do(kind,payload);
+ payload??=new();
+ for(int attempt=0;attempt<8;attempt++){
+  var room=peer.Last("state").GetProperty("room");
+  payload["code"]=room.GetProperty("code").GetString();payload["revision"]=room.GetProperty("revision").GetInt64();
+  var ack=await peer.Do(kind,payload);
+  if(ack.GetProperty("ok").GetBoolean()||ack.GetProperty("error").GetString()!="stale")return ack;
+  await Task.Delay(60);
+ }
+ throw new Exception("No current table snapshot for "+kind);
 }
 try{
  await Start();foreach(string user in new[]{"voice_tcp_a","voice_tcp_b","voice_tcp_c","voice_tcp_d","voice_tcp_e"}){
@@ -36,9 +43,15 @@ try{
  foreach(string mode in new[]{"landlord","stud","three","holdem","blackjack","mahjong","dice"}){
   int capacity=mode=="landlord"?3:mode=="mahjong"?4:2;var seated=peers.Take(capacity).ToArray();var outside=peers[4];
   Check((await seated[0].Do("create",new(){["game"]=mode,["public"]=true})).GetProperty("ok").GetBoolean(),"create "+mode);
-  string code=seated[0].Last("state").GetProperty("room").GetProperty("code").GetString()!;
-  foreach(var p in seated.Skip(1))Check((await p.Do("join",new(){["code"]=code})).GetProperty("ok").GetBoolean(),"join "+mode);
+  var created=await seated[0].Wait(f=>f.GetProperty("type").GetString()=="state"&&f.GetProperty("room").ValueKind==JsonValueKind.Object&&f.GetProperty("room").GetProperty("game").GetString()==mode);
+  string code=created.GetProperty("room").GetProperty("code").GetString()!;
+  foreach(var p in seated.Skip(1)){
+   Check((await p.Do("join",new(){["code"]=code})).GetProperty("ok").GetBoolean(),"join "+mode);
+   await p.Wait(f=>f.GetProperty("type").GetString()=="state"&&f.GetProperty("room").ValueKind==JsonValueKind.Object&&f.GetProperty("room").GetProperty("code").GetString()==code);
+  }
+  foreach(var p in seated)await p.Wait(f=>f.GetProperty("type").GetString()=="state"&&f.GetProperty("room").ValueKind==JsonValueKind.Object&&f.GetProperty("room").GetProperty("code").GetString()==code&&f.GetProperty("room").GetProperty("players").EnumerateArray().All(s=>s.ValueKind==JsonValueKind.Object));
   foreach(var p in seated)Check((await Table(p,"ready")).GetProperty("ok").GetBoolean(),"ready "+mode);
+  foreach(var p in seated)await p.Wait(f=>f.GetProperty("type").GetString()=="state"&&f.GetProperty("room").ValueKind==JsonValueKind.Object&&f.GetProperty("room").GetProperty("code").GetString()==code&&f.GetProperty("room").GetProperty("phase").GetString()=="playing");
   var room=seated[0].Last("state").GetProperty("room");Check(room.GetProperty("phase").GetString()=="playing","real WebSocket peers start "+mode);
   File.WriteAllText(Path.Combine(directory,mode+"-playing.json"),seated[0].Last("state").GetRawText());
   int actor=room.GetProperty("actor").GetInt32(),speaker=(actor+1)%capacity;long revision=room.GetProperty("revision").GetInt64();string phrase=mode=="landlord"?"coffee":"show";
