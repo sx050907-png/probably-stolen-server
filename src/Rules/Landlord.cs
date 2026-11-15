@@ -77,17 +77,28 @@ namespace NightStud
             }
             Turn=(Turn+1)%3;return true;
         }
-        internal int[] Suggest()
+        internal int[] Suggest()=>Suggestions().FirstOrDefault()??Array.Empty<int>();
+        internal int[][] Suggestions()
         {
             var h=Hands[Turn];var g=h.GroupBy(Rank).OrderBy(x=>x.Key).Select(x=>x.ToArray()).ToArray();
             var options=new List<int[]>();
             void Offer(IEnumerable<int> set){var p=set.ToArray();if(Beats(p))options.Add(p);}
+            IEnumerable<int[]> Wings(int[][] groups,int needed,int unit=1,int index=0){
+                if(needed==0){yield return Array.Empty<int>();yield break;}
+                if(index>=groups.Length)yield break;
+                int max=unit==2?Math.Min(1,groups[index].Length/2):Math.Min(needed,groups[index].Length);
+                for(int take=0;take<=Math.Min(max,needed);take++)
+                    foreach(var tail in Wings(groups,needed-take,unit,index+1))yield return groups[index].Take(take*unit).Concat(tail).ToArray();
+            }
+            void OfferWithWings(IEnumerable<int> body,int[][] groups,int count,int unit=1){
+                foreach(var wings in Wings(groups,count,unit))Offer(body.Concat(wings));
+            }
             Offer(h);
             foreach(var a in g){
                 for(int k=1;k<=a.Length;k++)Offer(a.Take(k));
                 var others=g.Where(x=>x!=a).ToArray();
                 if(a.Length>=3)foreach(var b in others){Offer(a.Take(3).Concat(b.Take(1)));if(b.Length>=2)Offer(a.Take(3).Concat(b.Take(2)));}
-                if(a.Length==4){Offer(a.Concat(others.SelectMany(x=>x).Take(2)));Offer(a.Concat(others.Where(x=>x.Length>=2).Take(2).SelectMany(x=>x.Take(2))));}
+                if(a.Length==4){OfferWithWings(a,others,2);OfferWithWings(a,others,2,2);}
             }
             if(h.Contains(52)&&h.Contains(53))Offer(new[]{52,53});
             for(int k=1;k<=3;k++)for(int i=0;i<g.Length;i++){
@@ -96,12 +107,14 @@ namespace NightStud
                     seq.AddRange(g[j].Take(k));int len=j-i+1;
                     if(len<(k==1?5:k==2?3:2))continue;
                     Offer(seq);
-                    if(k==3){var wings=g.Where((x,index)=>index<i||index>j).OrderBy(x=>x.Length).ToArray();
-                        Offer(seq.Concat(wings.SelectMany(x=>x).Take(len)));Offer(seq.Concat(wings.Where(x=>x.Length>=2).Take(len).SelectMany(x=>x.Take(2))));}
+                    if(k==3){var wings=g.Where((x,index)=>index<i||index>j).ToArray();
+                        OfferWithWings(seq,wings,len);OfferWithWings(seq,wings,len,2);}
                 }
             }
-            return options.OrderByDescending(x=>x.Length==h.Count).ThenBy(x=>Shape(x).kind=="王炸"||Shape(x).kind=="炸弹")
-                .ThenByDescending(x=>x.Length).ThenBy(x=>Shape(x).high).FirstOrDefault()??Array.Empty<int>();
+            int SplitCost(int[] play)=>g.Sum(group=>{int used=play.Count(c=>Rank(c)==Rank(group[0]));return used>0&&used<group.Length?(group.Length==4?12:group.Length==3?6:2):0;});
+            return options.GroupBy(x=>string.Join(",",x.Select(Rank).OrderBy(r=>r))).Select(group=>group.First())
+                .OrderByDescending(x=>x.Length==h.Count).ThenBy(x=>Shape(x).kind=="王炸"||Shape(x).kind=="炸弹")
+                .ThenBy(x=>SplitCost(x)).ThenByDescending(x=>x.Length).ThenBy(x=>Shape(x).high).ToArray();
         }
         internal void Bot()
         {

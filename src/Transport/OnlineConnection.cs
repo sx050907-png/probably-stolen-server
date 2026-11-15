@@ -111,7 +111,7 @@ namespace NightStudOnline
                 using var ws=new ClientWebSocket();socket=ws;ws.Options.KeepAliveInterval=TimeSpan.FromSeconds(15);
                 var uri=new UriBuilder(server){Scheme=server.Scheme=="https"?"wss":"ws",Path="/ws"}.Uri;
                 using(var connect=CancellationTokenSource.CreateLinkedTokenSource(cancel)){connect.CancelAfter(TimeSpan.FromSeconds(12));ws.ConnectAsync(uri,connect.Token).GetAwaiter().GetResult();}
-                Send(new JObject{{"type","hello"},{"protocol",1},{"token",token},{"games",new JArray("stud","three","holdem","blackjack","landlord","mahjong","dice")},{"capabilities",new JArray("storeStakes","sharedShop","shopReception","roundGoods","shopBell","tradeBatch","shopCounterBatch")}}.ToString(Formatting.None),cancel);
+                Send(new JObject{{"type","hello"},{"protocol",1},{"token",token},{"games",new JArray("stud","three","holdem","blackjack","landlord","mahjong","dice")},{"capabilities",new JArray("storeStakes","sharedShop","shopReception","roundGoods","shopBell","tradeBatch","shopCounterBatch","contacts")}}.ToString(Formatting.None),cancel);
                 var bytes=new byte[4096];
                 while(!cancel.IsCancellationRequested && ws.State==WebSocketState.Open)
                 {

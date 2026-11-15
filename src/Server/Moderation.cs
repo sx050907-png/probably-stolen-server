@@ -46,7 +46,11 @@ public sealed class Moderation(string directory)
         return Content(text);
     }
     public string Content(string? text){
-        Reload();string value=(text??"").Trim();
+        Reload();return Filter(rules,text);
+    }
+    public static string DefaultContent(string? text)=>Filter(new Rules(),text);
+    static string Filter(Rules rules,string? text){
+        string value=(text??"").Trim();
         if(value.Length is <1 or >120||value.Any(c=>char.IsControl(c)))throw new WireFault("chat_length","消息请保持在 1–120 字内。");
         value=string.Concat(value.Where(c=>char.GetUnicodeCategory(c)!=UnicodeCategory.Format));
         string normalized;try{normalized=value.Normalize(NormalizationForm.FormKC);}catch(ArgumentException){throw new WireFault("chat_filtered","消息中包含无效字符。");}

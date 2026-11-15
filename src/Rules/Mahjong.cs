@@ -115,6 +115,11 @@ namespace NightStud
             var h=hand.ToArray();
             return Enumerable.Range(0,34).Where(t=>h.Count(x=>x==t)+Melds[s].Count(x=>x==t)<4&&Winning(h.Append(t),groups[s].Count));
         }
+        internal sealed class WaitPlan {public int Discard {get;set;}public int[] Waits {get;set;}}
+        internal WaitPlan[] WaitPlans(int seat){
+            if(Done||Reply||Turn!=seat||Hands[seat].Count%3!=2)return Array.Empty<WaitPlan>();
+            return Hands[seat].Distinct().Where(MayDiscard).Select(tile=>new WaitPlan{Discard=tile,Waits=Waits(seat,Without(seat,tile)).Distinct().OrderBy(t=>t).ToArray()}).Where(p=>p.Waits.Length>0).ToArray();
+        }
         bool Ron(int s)=>s!=From && !robbingClosed && !missed[s] && Winning(Hands[s].Append(Last),groups[s].Count);
         internal bool PlayerRon=>Reply && Ron(0);
         internal bool SelfWin=>!Done&&!Reply&&Drawn>=0&&Winning(Hands[Turn],groups[Turn].Count);

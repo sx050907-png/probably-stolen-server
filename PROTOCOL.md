@@ -1,6 +1,6 @@
-# 协议 v1 / 服务端 0.6.6
+# 协议 v1 / 服务端 0.7.0
 
-HTTP 和 WebSocket 共用一个 TCP 端口。状态接口 `GET /health`，测试页 `/`，WebSocket 路径 `/ws`。UTF-8 JSON，入站单条消息上限 131072 字节；HTTP 请求体上限 4096 字节。
+HTTP 和 WebSocket 共用一个 TCP 端口。状态接口 `GET /health`，WebSocket 路径 `/ws`；网页测试界面默认关闭，只有允许网页应用的自建环境才显式开启。UTF-8 JSON，入站单条消息上限 131072 字节；HTTP 请求体上限 4096 字节。
 
 ## 建立会话
 
@@ -195,3 +195,10 @@ refreshToken 为随机 selector.secret，数据库仅存 secret 的 SHA256，30 
 新柜台的 `tradeOffer` 可带 `counterLot` 与 `counterHash`（UTF8 资料 SHA256 的 Base64），省略重复的 `payload`。服务器取回当时验证的原资料，再按原有交易流程保存报价；资料改变或租期失效会拒绝。断线恢复按原交易编号查询，已存在收据先于柜台及到访检查处理；恢复请求可携带原持久暂存的完整资料。
 
 单条传入 WebSocket 上限 131,072 字节、客户端接收 196,608 字节不变。新发物品预检 JSON 字符串的传入与返回编码预算，服务器再次核对返回预算。客户端旧寄存解码不套用新增发送预算，防止更新阻断既有恢复。没有新增数据库表或公网页测试入口。
+
+
+## 0.7.1：斗地主主动短句
+
+`tableVoice` 能力允许 `tablePhrase` 的 `move` 为 `say:wait`、`say:coffee`、`say:nice`、`say:partner`、`say:show`、`say:seventeen`、`say:ready`。发送者必须已入当前正在进行的斗地主房间，code 和 revision 一致；可在非本人回合发送。全桌 8 秒冷却，自动 wait 仍验证当前行动者、20 秒静置和 35 秒冷却。
+
+广播 tablePhrase 包含 id、code、hand、phrase、speaker（服务端确定的座位）、manual。不改变牌局 revision。只广播给本桌在线席位。客户端按同一 speaker 选择音色，不随 ownSeat 改变。任意文本、文件、路径均拒绝。旧服没有该能力时，客户端显示更新提示。

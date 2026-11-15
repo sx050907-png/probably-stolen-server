@@ -8,6 +8,20 @@ int checks=0;
 void Check(bool value,string reason){checks++;if(!value)throw new Exception(reason);}
 string output=args.FirstOrDefault()??Path.Combine(Directory.GetCurrentDirectory(),"work/group040-tests");Directory.CreateDirectory(output);
 void Fault(Action action,string code){try{action();throw new Exception("Expected "+code);}catch(WireFault e){Check(e.Code==code,"rejection "+code);}}
+var hintGame=new Landlord(new Random(11));foreach(var hand in hintGame.Hands)hand.Clear();hintGame.Turn=0;hintGame.Boss=0;
+hintGame.Hands[0].AddRange(new[]{1,14,27,40,2,15,3,16,4,17});
+Check(hintGame.Suggestions().Count(p=>Landlord.Shape(p).kind=="四带二")==6,"hint covers all four-with-two rank combinations");
+Check(hintGame.Suggestions().Count(p=>Landlord.Shape(p).kind=="四带两对")==3,"hint covers all four-with-two-pair combinations");
+hintGame.Hands[0].Clear();hintGame.Hands[0].AddRange(new[]{1,14,27,2,15,28,4,17,5,18,6,7});
+Check(hintGame.Suggestions().Count(p=>Landlord.Shape(p).kind=="飞机带单")==8,"hint covers all alternative plane wings");
+for(int seed=0;seed<50;seed++){
+ var sample=new Landlord(new Random(seed));sample.Bid(true);sample.Last=seed%2==0?new[]{1}:Array.Empty<int>();
+ var original=sample.Hands[sample.Turn].ToArray();var choices=sample.Suggestions();
+ Check(choices.Select(p=>string.Join(',',p.Select(Landlord.Rank).Order())).Distinct().Count()==choices.Length,"hint variants are not suit-only duplicates");
+ foreach(var choice in choices)Check(choice.Distinct().Count()==choice.Length&&choice.All(original.Contains)&&Landlord.Shape(choice).kind!=null&&
+  (sample.Last.Length==0||Landlord.Shape(choice).kind is "王炸" or "炸弹"||Landlord.Shape(choice).kind=="单张"&&Landlord.Shape(choice).high>3),"hint uses owned cards and beats current play");
+ Check(original.SequenceEqual(sample.Hands[sample.Turn]),"hint computation does not play or mutate cards");
+}
 foreach(string mode in new[]{"landlord","mahjong","dice"}){
     var moves=new HashSet<string>();int wins=0;
     for(int seed=1;seed<=80;seed++){
@@ -48,6 +62,17 @@ Check(!passed.Done&&passed.Turn==2&&!passed.Reply&&passed.Melds[2].SequenceEqual
 Check(Mahjong.Winning(new[]{0,1,2,3,4,5,9,10,11,18,19,20,27,27},0),"plain winning hand");
 Check(Mahjong.Winning(new[]{0,0,1,1,9,9,10,10,18,18,27,27,33,33},0),"seven pairs");
 Check(Mahjong.Winning(new[]{0,8,9,17,18,26,27,28,29,30,31,32,33,33},0),"thirteen orphans");
+var adviceRound=new ExtraRound("mahjong",5,1,new[]{10000,10000,10000,10000},new Random(17));
+var advice=(Mahjong)typeof(ExtraRound).GetField("mahjong",BindingFlags.NonPublic|BindingFlags.Instance)!.GetValue(adviceRound)!;
+advice.Hands[0].Clear();advice.Hands[0].AddRange(new[]{0,1,2,3,4,5,9,10,11,18,19,20,27,27});advice.Turn=0;advice.Reply=false;advice.Done=false;
+Check(advice.WaitPlans(0).Length>2,"Mahjong provides multiple discard alternatives");
+foreach(var plan in advice.WaitPlans(0)){
+ var rest=advice.Hands[0].ToList();Check(rest.Remove(plan.Discard),"advice only discards an owned tile");
+ foreach(int wait in plan.Waits)Check(Mahjong.Winning(rest.Append(wait),0)&&rest.Count(t=>t==wait)<4,"every listed wait completes the legal hand");
+}
+Check(JsonSerializer.SerializeToElement(adviceRound.View(0),Wire.Json).GetProperty("waitPlans").GetArrayLength()>2,"server sends own discard advice");
+Check(JsonSerializer.SerializeToElement(adviceRound.View(1),Wire.Json).GetProperty("waitPlans").GetArrayLength()==0,"server never exposes the current opponent's advice");
+advice.Reply=true;Check(advice.WaitPlans(0).Length==0,"claim response does not offer illegal discard advice");advice.Reply=false;advice.Done=true;Check(advice.WaitPlans(0).Length==0,"finished hand clears discard advice");
 
 var fake=new OnlineRound("landlord",10,1,new[]{1000,1000,1000},new Random(17));fake.Play(new Command{Move="bid"});
 string before=Wire.Encode(fake.Detail(fake.Actor)!);var cardsBefore=fake.Hand.Select(h=>h.ToArray()).ToArray();
@@ -64,6 +89,28 @@ foreach(string mode in new[]{"landlord","mahjong","dice"}){
     foreach(var peer in peers.Skip(1))await peer.Ok("join",x=>x.Code=code);
     Check(a.Room.GetProperty("capacity").GetInt32()==cap,"capacity "+mode);
     foreach(var peer in peers)await peer.Ok("ready");await a.Flush();
+    if(mode=="landlord"){
+        var phraseRoom=Current(a);var speaker=peers[phraseRoom.Game!.Actor];var other=peers.First(p=>p!=speaker);long rev=phraseRoom.Revision;int outside=d.Phrases;
+        Check((await speaker.Command("tablePhrase",x=>{x.Code=code;x.Move="wait";})).GetProperty("error").GetString()=="phrase_rate","idle voice waits twenty seconds");
+        phraseRoom.Touched=DateTime.UtcNow.AddSeconds(-21);
+        Check((await other.Command("tablePhrase",x=>{x.Code=code;x.Move="wait";})).GetProperty("error").GetString()=="stale","off-turn player cannot trigger idle voice");
+        Check((await speaker.Command("tablePhrase",x=>{x.Code=code;x.Move="external-path";})).GetProperty("error").GetString()=="bad_phrase","voice protocol rejects arbitrary clip paths");
+        await speaker.Ok("tablePhrase",x=>{x.Code=code;x.Move="wait";});foreach(var peer in peers)await peer.Flush();await d.Flush();
+        Check(peers.All(p=>p.Phrases==1)&&d.Phrases==outside,"voice event reaches current table only");
+        Check(phraseRoom.Revision==rev,"voice does not alter gameplay revision");
+        Check((await speaker.Command("tablePhrase",x=>{x.Code=code;x.Move="wait";})).GetProperty("error").GetString()=="phrase_rate","voice cooldown enforced by server");
+        Check(RoomHub.Features.Contains("tableVoice"),"manual table voice is feature negotiated");
+        foreach(string phrase in new[]{"wait","coffee","nice","partner","show","seventeen","ready"}){
+            phraseRoom.PhraseAt=DateTime.UtcNow.AddSeconds(-9);int received=other.Phrases;
+            await other.Ok("tablePhrase",x=>{x.Code=code;x.Move="say:"+phrase;});foreach(var peer in peers)await peer.Flush();await d.Flush();
+            Check(other.Phrases==received+1&&d.Phrases==outside,"manual phrase broadcast stays inside room: "+phrase);
+            Check(other.Phrase.GetProperty("speaker").GetInt32()==Array.FindIndex(phraseRoom.Seats,s=>s?.Session==other.Session)&&other.Phrase.GetProperty("manual").GetBoolean(),"manual phrase uses authenticated speaker seat");
+            Check((await speaker.Command("tablePhrase",x=>{x.Code=code;x.Move="say:"+phrase;})).GetProperty("error").GetString()=="phrase_rate","manual voice room cooldown prevents cross-player spam");
+        }
+        Check((await other.Command("tablePhrase",x=>{x.Code=code;x.Move="say:../../malicious.ogg";})).GetProperty("error").GetString()=="bad_phrase","manual voice rejects arbitrary files and text");
+        Check((await other.Command("tablePhrase",x=>{x.Code="OTHER";x.Move="say:coffee";})).GetProperty("error").GetString()=="stale","manual voice rejects cross-room injection");
+        Check(phraseRoom.Revision==rev,"manual phrases preserve card state and revision");
+    }
     File.WriteAllText(Path.Combine(output,mode+"-playing.json"),Wire.Encode(new{type="state",room=a.Room}));
     {var active=peers[Current(a).Game!.Actor];await active.Flush();File.WriteAllText(Path.Combine(output,mode+"-acting.json"),Wire.Encode(new{type="state",room=active.Room}));}
     int steps=0;var room=Current(a);
@@ -114,7 +161,7 @@ File.WriteAllText(Path.Combine(output,"success.txt"),proof);Console.WriteLine(pr
 
 sealed class Peer:IAsyncDisposable{
     readonly RoomHub hub;readonly Sink socket=new();readonly Client client;readonly CancellationTokenSource stop=new();readonly Task pump;
-    public Session Session{get;}public JsonElement Room=>socket.Room;
+    public Session Session{get;}public JsonElement Room=>socket.Room;public JsonElement Phrase=>socket.Phrase;public int Phrases=>socket.Phrases;
     public Peer(RoomHub hub,string name,bool modern=true){this.hub=hub;Session=hub.Login(name);client=new Client(socket);pump=client.Pump(stop.Token);hub.Attach(new Command{Type="hello",Protocol=1,Token=Session.Token,Games=modern?OnlineRound.Games:null},client);}
     public async Task Flush(){Session.RateCount=0;int before=socket.Pongs;hub.Handle(Session,client,new(){Type="ping"});for(int n=0;n<3000&&socket.Pongs==before;n++)await Task.Delay(1);if(socket.Pongs==before)throw new Exception("Flush timeout");}
     public async Task<JsonElement> Command(string type,Action<Command>? set=null){await Flush();var command=new Command{Type=type,Id=Guid.NewGuid().ToString("N"),Revision=Room.ValueKind==JsonValueKind.Object?Room.GetProperty("revision").GetInt64():null};set?.Invoke(command);hub.Handle(Session,client,command);await Flush();return socket.Ack;}
@@ -123,11 +170,11 @@ sealed class Peer:IAsyncDisposable{
     public async ValueTask DisposeAsync(){hub.Detach(Session,client);client.Stop();stop.Cancel();await pump;stop.Dispose();}
 }
 sealed class Sink:WebSocket{
-    public JsonElement Room,Ack;public int Pongs;WebSocketState state=WebSocketState.Open;
+    public JsonElement Room,Ack,Phrase;public int Pongs,Phrases;WebSocketState state=WebSocketState.Open;
     public override WebSocketCloseStatus? CloseStatus=>null;public override string? CloseStatusDescription=>null;public override WebSocketState State=>state;public override string? SubProtocol=>null;
     public override void Abort()=>state=WebSocketState.Aborted;public override void Dispose()=>Abort();
     public override Task CloseAsync(WebSocketCloseStatus s,string? t,CancellationToken c){Abort();return Task.CompletedTask;}
     public override Task CloseOutputAsync(WebSocketCloseStatus s,string? t,CancellationToken c)=>CloseAsync(s,t,c);
     public override Task<WebSocketReceiveResult> ReceiveAsync(ArraySegment<byte> b,CancellationToken c)=>throw new NotSupportedException();
-    public override Task SendAsync(ArraySegment<byte> bytes,WebSocketMessageType type,bool end,CancellationToken cancel){using var doc=JsonDocument.Parse(bytes.AsMemory());var v=doc.RootElement;switch(v.GetProperty("type").GetString()){case "state":Room=v.GetProperty("room").Clone();break;case "ack":Ack=v.Clone();break;case "pong":Interlocked.Increment(ref Pongs);break;}return Task.CompletedTask;}
+    public override Task SendAsync(ArraySegment<byte> bytes,WebSocketMessageType type,bool end,CancellationToken cancel){using var doc=JsonDocument.Parse(bytes.AsMemory());var v=doc.RootElement;switch(v.GetProperty("type").GetString()){case "state":Room=v.GetProperty("room").Clone();break;case "ack":Ack=v.Clone();break;case "tablePhrase":Phrase=v.Clone();Interlocked.Increment(ref Phrases);break;case "pong":Interlocked.Increment(ref Pongs);break;}return Task.CompletedTask;}
 }

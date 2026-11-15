@@ -26,6 +26,7 @@ public sealed class Session(string name,string? accountId=null,string provider="
     public bool ShopBell;
     public bool TradeBatches;
     public bool CounterBatches;
+    public bool Contacts;
     public bool AssetBets;
     public string Avatar="hood_ash";
     public DateTime FundsSince=DateTime.UtcNow;
@@ -62,6 +63,7 @@ public sealed class Room(string code, int ante, int buyIn, string mode="stud", b
     public object? Result;
     public List<object> Events { get; } = new();
     public DateTime Touched = DateTime.UtcNow;
+    public DateTime PhraseAt=DateTime.MinValue;
 }
 
 public sealed partial class RoomHub(int graceSeconds, Action<ServerEvent>? audit = null,Accounts? accounts=null,Moderation? moderation=null)
@@ -90,7 +92,7 @@ public sealed partial class RoomHub(int graceSeconds, Action<ServerEvent>? audit
     readonly Dictionary<string, Invitation> invitations = new();
     readonly Dictionary<string, DateTime> inviteCooldown = new();
     sealed record Invitation(string Id,string From,string To,string Code,DateTime Expires);
-    public static readonly string[] Features={"lobby","invitations","stud","three","holdem","blackjack","landlord","mahjong","dice","bots","accounts","privacy","playerFilter","chat","visits","trades","storeStakes","goodsStakes","sharedShop","shopReception","roundGoods","groupGoods","shopBell","shopDisplay","shopCounter","tradeBatch","shopCounterBatch","higherStakes"};
+    public static readonly string[] Features={"lobby","invitations","stud","three","holdem","blackjack","landlord","mahjong","dice","bots","accounts","privacy","playerFilter","chat","visits","trades","storeStakes","goodsStakes","sharedShop","shopReception","roundGoods","groupGoods","shopBell","shopDisplay","shopCounter","tradeBatch","shopCounterBatch","higherStakes","contacts","landlordBanter","tableVoice"};
     void Audit(string name,Session session,Room? room=null,string? reason=null)=>audit?.Invoke(new ServerEvent(name,session.Id,room?.Code,room?.Mode,reason));
     static void FundsRate(Session session){
         var now=DateTime.UtcNow;if((now-session.FundsSince).TotalMinutes>=1){session.FundsSince=now;session.FundsCount=0;}
@@ -123,7 +125,7 @@ public sealed partial class RoomHub(int graceSeconds, Action<ServerEvent>? audit
         lock(gate){
             var existing=sessions.Values.FirstOrDefault(s=>s.AccountId==identity.Id);
             if(existing!=null){
-                string old=existing.Token;existing.Client?.Stop();existing.Client=null;existing.Disconnected=DateTime.UtcNow;
+                EndPhoneFor(existing.Id,"reconnected");string old=existing.Token;existing.Client?.Stop();existing.Client=null;existing.Disconnected=DateTime.UtcNow;
                 existing.Token=Wire.Token();sessions.Remove(old);sessions.Add(existing.Token,existing);existing.Privacy=accounts?.GetPrivacy(identity.Id)??new();existing.Avatar=accounts?.GetAppearance(identity.Id)??"hood_ash";
                 if(Current(existing) is {} room){room.Revision++;Broadcast(room);}Audit("account_reauthenticated",existing);return existing;
             }
@@ -137,7 +139,7 @@ public sealed partial class RoomHub(int graceSeconds, Action<ServerEvent>? audit
         lock(gate){
             if(token==null||!sessions.TryGetValue(token,out var session))return;
             if(Current(session) is {} room)Leave(room,session,"logout");
-            EndShopPresence(session);session.Client?.Stop();sessions.Remove(token);BroadcastLobby();Audit("account_logged_out",session);
+            EndPhoneFor(session.Id,"disconnected");EndShopPresence(session);session.Client?.Stop();sessions.Remove(token);BroadcastLobby();Audit("account_logged_out",session);
         }
     }
 
@@ -162,11 +164,13 @@ public sealed partial class RoomHub(int graceSeconds, Action<ServerEvent>? audit
             session.TradeBatches=hello.Capabilities?.Contains("tradeBatch")==true;
             session.CounterBatches=session.TradeBatches&&session.SharedShop&&hello.Capabilities?.Contains("shopCounterBatch")==true;
             session.AssetBets=hello.Capabilities?.Contains("roundGoods")==true;
+            session.Contacts=hello.Capabilities?.Contains("contacts")==true;
             session.Disconnected = null;
             session.LastSeen = DateTime.UtcNow;
             client.Send(new { type = "welcome", protocol = Wire.Version, playerId = session.Id,
                 name = session.Name, provider=session.Provider, mode = "practice", features = FeaturesFor(session), reconnectSeconds = GraceSeconds });
             client.Send(new{type="announcement",announcement});
+            SendContacts(session);
             if (Current(session) is { } room) { room.Revision++; Broadcast(room); }
             else SendLobby(session);
             Audit("session_attached",session,Current(session));BroadcastLobby();
@@ -179,6 +183,7 @@ public sealed partial class RoomHub(int graceSeconds, Action<ServerEvent>? audit
         lock (gate)
         {
             if (session.Client != client) return;
+            EndPhoneFor(session.Id,"disconnected");
             session.Client = null;
             session.Disconnected = DateTime.UtcNow;
             Audit("session_detached",session,Current(session));
@@ -220,6 +225,9 @@ public sealed partial class RoomHub(int graceSeconds, Action<ServerEvent>? audit
                 if (session.Recent.Count > 128) session.Used.Remove(session.Recent.Dequeue());
                 switch (command.Type)
                 {
+                    case "tablePhrase": TablePhrase(session,command);client.Send(new{type="ack",id=command.Id,ok=true});return;
+                    case "contacts":case "contactSettings":case "contactBlock":case "contactHistory":case "contactRead":case "contactSend":case "contactReceipt":case "phoneStart":case "phoneAccept":case "phoneEnd":
+                        ContactCommand(session,command);client.Send(new{type="ack",id=command.Id,ok=true});return;
                     case "playerFilter": Need(command.Filter is "all" or "steam" or "nonSteam","bad_filter","玩家筛选无效。");session.PlayerFilter=command.Filter;client.Send(new{type="ack",id=command.Id,ok=true});SendDirectory(session);return;
                     case "privacy": SetPrivacy(session,command);break;
                     case "chat": Chat(session,command.Text,command.Channel);client.Send(new{type="ack",id=command.Id,ok=true});return;
@@ -485,6 +493,7 @@ public sealed partial class RoomHub(int graceSeconds, Action<ServerEvent>? audit
         lock (gate)
         {
             var now = DateTime.UtcNow;
+            ExpireContacts(now);
             ExpireShopInquiries(now);
             ExpireCounters(now);
             foreach(var session in sessions.Values.Where(s=>Online(s)&&moderation?.Banned(s.Id)==true).ToArray())session.Client?.Stop();

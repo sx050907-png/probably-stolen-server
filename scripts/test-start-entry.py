@@ -56,7 +56,9 @@ with tempfile.TemporaryDirectory(prefix='simpfun start ',dir=work) as temporary:
         raise AssertionError('No server health: '+stop(process)[-2000:])
     try:
         entry();process,health=run()
-        check(health['version']=='0.6.12','start.sh downloads and starts the published server with no console input')
+        import xml.etree.ElementTree as ET
+        expected_version=ET.parse(repository/'src/Server/NightStud.Server.csproj').findtext('.//Version')
+        check(health['version']==expected_version,'start.sh downloads and starts the published server with no console input')
         check(all((target/'app/wwwroot'/name).is_file() for name in ('index.html','app.js','style.css')),'deployed archive contains actual test files for default-off verification')
         for route in ('/','/index.html','/app.js','/style.css'):
             try:

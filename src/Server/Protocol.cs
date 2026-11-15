@@ -60,6 +60,11 @@ public sealed class Command
     public string Filter { get; set; }="all";
     public bool AllowVisits { get; set; }
     public bool AllowInvites { get; set; }=true;
+    public bool AllowMessages {get;set;}=true;
+    public bool AllowCalls {get;set;}=true;
+    public bool Blocked {get;set;}
+    public string Call {get;set;}="";
+    public long Sequence {get;set;}
     public string Text { get; set; }="";
     public string Channel {get;set;}="";
     public string Payload { get; set; }="";

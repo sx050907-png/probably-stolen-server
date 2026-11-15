@@ -115,6 +115,7 @@ internal sealed class ExtraRound
             melds=m.Melds.Select((set,s)=>set.Select(t=>s!=viewer&&!Done&&m.Concealed(s).Contains(t)?-1:t).ToArray()).ToArray(),
             sizes=Enumerable.Range(0,4).Select(m.MeldSizes).ToArray(),
             waits=m.Hands[viewer].Count%3==1?m.OnlineWaits(viewer):Array.Empty<int>(),
+            waitPlans=m.WaitPlans(viewer),
             discardChoices=!Done&&!m.Reply&&m.Turn==viewer?m.OnlineDiscardChoices():Array.Empty<int>(),
             winners=m.Winners.ToArray(),note=m.Note};
         return new{dealer=Dealer,wagered,bet=wagered?(odd?"odd":"even"):"",faces=Done?dice:Array.Empty<int>()};
