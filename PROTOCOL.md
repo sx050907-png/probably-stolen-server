@@ -209,3 +209,18 @@ refreshToken 为随机 selector.secret，数据库仅存 secret 的 SHA256，30 
 新能力 `tableVoiceAllModes` 表示手动短句适用于七种牌局，且全桌冷却为3秒。保留 `tableVoice` 兼容原斗地主入口。自动催牌仍只用于斗地主。
 
 斗地主可用 wait/coffee/nice/partner/show/seventeen/ready；stud、three、holdem、blackjack、mahjong 可用 wait/nice/show/ready；dice 只可用 wait/show。不符合当前玩法的代号返回 bad_phrase。消息与响应字段不变；发话座位来自服务端，不能由客户端指定。
+
+
+## 0.8.0：账号电话、异步玩家市场与实体道具
+
+协议仍为 1；新增服务能力 playerPhones、playerMarket、physicalGear。旧客户端继续使用原有接口；新客户端在旧服禁用不受支持的新操作。
+
+每个 accounts 记录有持久六位虚拟号码，不以 0 开头。账号注册触发分配，已有账号按历史记录补齐；号码不绑定客户端存档。phoneDial 的 number 为字符串，必须是六位 ASCII 数字；只解析当前服务器账号，NPC 325 由原版电话处理。服务端沿用 contacts 隐私、屏蔽、在线状态与频率检查。phoneResolved 返回 peer、name、number，离线可据此留言。
+
+来电 20 秒未接听结束。phone 帧带对方号码；contacts 帧增加本人 number 与 owner 私有通话记录。phoneRead 标记记录已读。记录按每人最多 60 条、30 天保留；接听仍为文字通话，没有录音或麦克风接口。消息正文不进入日志。
+
+marketBrowse / marketPreview 读取公开上架摘要与单件详情。marketOffer 绑定调用者及 saveId，提交唯一 listing id、经 GoodsLedger 验证的 typed payload 和 1..1000000 价格；每账号最多 20 个活动上架、全服 2000 个，7 个现实日到期。marketBuy 校验原报价，在一个 SQLite 事务中扣买家可用钱包、加卖家上架时绑定钱包并转移货物归属。已被牌桌占用的钱不能用于购买。竞争买家只会成交一位。
+
+marketCancel / marketStatus / marketDelivered 凭账号、原服务器和 saveId 恢复；缺失上架取消时先写 tombstone，迟到的上传不能复活已返还货物。售出货物只能由买家、取消货物只能由原卖家取回。客户端先持久保存本地领货凭证及恢复记录，成功后才发送 marketDelivered；收到该回执后服务器才清除已交付资料。重复请求幂等，未交付货物跨重启保留。
+
+physicalGear 仅扩充十个 GearCatalogue 的 night_stud.gear.* 精确标识，复用原 typed goods 编解码、寄售及押注规则；不会放开任意模组 ID、精灵路径或剧情物品。客户端付费旧数量先保存迁移记录，再发实际物品；写盘失败保留旧计数。

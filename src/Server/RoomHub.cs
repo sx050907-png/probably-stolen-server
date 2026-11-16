@@ -92,7 +92,7 @@ public sealed partial class RoomHub(int graceSeconds, Action<ServerEvent>? audit
     readonly Dictionary<string, Invitation> invitations = new();
     readonly Dictionary<string, DateTime> inviteCooldown = new();
     sealed record Invitation(string Id,string From,string To,string Code,DateTime Expires);
-    public static readonly string[] Features={"lobby","invitations","stud","three","holdem","blackjack","landlord","mahjong","dice","bots","accounts","privacy","playerFilter","chat","visits","trades","storeStakes","goodsStakes","sharedShop","shopReception","roundGoods","groupGoods","shopBell","shopDisplay","shopCounter","tradeBatch","shopCounterBatch","higherStakes","contacts","landlordBanter","tableVoice","tableVoiceAllModes"};
+    public static readonly string[] Features={"lobby","invitations","stud","three","holdem","blackjack","landlord","mahjong","dice","bots","accounts","privacy","playerFilter","chat","visits","trades","storeStakes","goodsStakes","sharedShop","shopReception","roundGoods","groupGoods","shopBell","shopDisplay","shopCounter","tradeBatch","shopCounterBatch","higherStakes","contacts","playerPhones","playerMarket","physicalGear","landlordBanter","tableVoice","tableVoiceAllModes"};
     void Audit(string name,Session session,Room? room=null,string? reason=null)=>audit?.Invoke(new ServerEvent(name,session.Id,room?.Code,room?.Mode,reason));
     static void FundsRate(Session session){
         var now=DateTime.UtcNow;if((now-session.FundsSince).TotalMinutes>=1){session.FundsSince=now;session.FundsCount=0;}
@@ -168,7 +168,7 @@ public sealed partial class RoomHub(int graceSeconds, Action<ServerEvent>? audit
             session.Disconnected = null;
             session.LastSeen = DateTime.UtcNow;
             client.Send(new { type = "welcome", protocol = Wire.Version, playerId = session.Id,
-                name = session.Name, provider=session.Provider, mode = "practice", features = FeaturesFor(session), reconnectSeconds = GraceSeconds });
+                name = session.Name, provider=session.Provider, phone=phones?.Number(session.AccountId)??"", mode = "practice", features = FeaturesFor(session), reconnectSeconds = GraceSeconds });
             client.Send(new{type="announcement",announcement});
             SendContacts(session);
             if (Current(session) is { } room) { room.Revision++; Broadcast(room); }
@@ -226,8 +226,10 @@ public sealed partial class RoomHub(int graceSeconds, Action<ServerEvent>? audit
                 switch (command.Type)
                 {
                     case "tablePhrase": TablePhrase(session,command);client.Send(new{type="ack",id=command.Id,ok=true});return;
-                    case "contacts":case "contactSettings":case "contactBlock":case "contactHistory":case "contactRead":case "contactSend":case "contactReceipt":case "phoneStart":case "phoneAccept":case "phoneEnd":
+                    case "contacts":case "contactSettings":case "contactBlock":case "contactHistory":case "contactRead":case "contactSend":case "contactReceipt":case "phoneStart":case "phoneAccept":case "phoneEnd":case "phoneDial":case "phoneRead":
                         ContactCommand(session,command);client.Send(new{type="ack",id=command.Id,ok=true});return;
+                    case "marketBrowse":case "marketPreview":case "marketOffer":case "marketBuy":case "marketCancel":case "marketStatus":case "marketDelivered":
+                        MarketCommand(session,command);client.Send(new{type="ack",id=command.Id,ok=true});return;
                     case "playerFilter": Need(command.Filter is "all" or "steam" or "nonSteam","bad_filter","玩家筛选无效。");session.PlayerFilter=command.Filter;client.Send(new{type="ack",id=command.Id,ok=true});SendDirectory(session);return;
                     case "privacy": SetPrivacy(session,command);break;
                     case "chat": Chat(session,command.Text,command.Channel);client.Send(new{type="ack",id=command.Id,ok=true});return;
@@ -460,8 +462,8 @@ public sealed partial class RoomHub(int graceSeconds, Action<ServerEvent>? audit
         }};
     }
 
-    object DirectoryView(Session viewer)=>new {type="lobby",selfId=viewer.Id,selfAppearance=viewer.Avatar,features=FeaturesFor(viewer),totalOnline=sessions.Values.Count(Online),filter=viewer.PlayerFilter,privacy=viewer.Privacy,
-        players=sessions.Values.Where(Online).Where(s=>viewer.PlayerFilter=="all"||(s.Provider=="steam")== (viewer.PlayerFilter=="steam")).Take(100).Select(s=>new{id=s.Id,name=s.Name,provider=s.Provider,avatar=s.Avatar,allowVisits=s.Privacy.AllowVisits&&shops.ContainsKey(s.Id),allowInvites=s.Privacy.AllowInvites,status=s.RoomCode==null?"lobby":Current(s)?.Game is {Done:false}?"playing":"room"}).ToArray(),
+    object DirectoryView(Session viewer)=>new {type="lobby",selfId=viewer.Id,selfPhone=phones?.Number(viewer.AccountId)??"",selfAppearance=viewer.Avatar,features=FeaturesFor(viewer),totalOnline=sessions.Values.Count(Online),filter=viewer.PlayerFilter,privacy=viewer.Privacy,
+        players=sessions.Values.Where(Online).Where(s=>viewer.PlayerFilter=="all"||(s.Provider=="steam")== (viewer.PlayerFilter=="steam")).Take(100).Select(s=>new{id=s.Id,name=s.Name,number=phones?.Number(s.AccountId)??"",provider=s.Provider,avatar=s.Avatar,allowVisits=s.Privacy.AllowVisits&&shops.ContainsKey(s.Id),allowInvites=s.Privacy.AllowInvites,status=s.RoomCode==null?"lobby":Current(s)?.Game is {Done:false}?"playing":"room"}).ToArray(),
         rooms=rooms.Values.Where(r=>r.Public).Take(64).Select(r=>new{code=r.Code,name=r.Name,game=r.Mode,economy=r.Economy,seats=r.Seats.Count(s=>s!=null),capacity=r.Seats.Length,bots=r.Seats.Count(s=>s?.Session.Provider=="bot"),canJoin=(r.Game is null||r.Game.Done)&&r.Seats.Any(s=>s==null||s.Session.Provider=="bot"),playing=r.Game is {Done:false},ante=r.Ante,buyIn=r.BuyIn}).ToArray(),
         invitations=invitations.Values.Where(i=>i.To==viewer.Id&&i.Expires>DateTime.UtcNow&&rooms.ContainsKey(i.Code)).Take(8).Select(i=>new{id=i.Id,fromId=i.From,fromName=sessions.Values.FirstOrDefault(s=>s.Id==i.From)?.Name??"桌友",code=i.Code,game=rooms[i.Code].Mode,name=rooms[i.Code].Name,expiresAt=i.Expires}).ToArray()};
     void SendDirectory(Session viewer)=>viewer.Client?.Send(DirectoryView(viewer));

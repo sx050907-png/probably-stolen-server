@@ -5,9 +5,10 @@
     <Nullable>enable</Nullable>
     <InvariantGlobalization>true</InvariantGlobalization>
     <AssemblyName>NightStud.Server</AssemblyName>
-    <Version>0.7.2</Version>
+    <Version>0.8.0</Version>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="../Shared/GearCatalogue.cs" Link="GearCatalogue.cs" />
     <Compile Include="../Shared/WagerRules.cs" Link="WagerRules.cs" />
     <Compile Include="../Shared/TableVoiceRules.cs" Link="TableVoiceRules.cs" />
     <Compile Include="../Shared/ServerNotice.cs" Link="ServerNotice.cs" />

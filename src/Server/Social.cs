@@ -111,7 +111,7 @@ public sealed partial class RoomHub
             using var doc=JsonDocument.Parse(payload,new JsonDocumentOptions{MaxDepth=16});var root=doc.RootElement;
             if(root.ValueKind!=JsonValueKind.Object||!root.TryGetProperty("nodes",out var nodes)||nodes.ValueKind!=JsonValueKind.Array||nodes.GetArrayLength() is <1 or >64)return false;
             foreach(var node in nodes.EnumerateArray()){
-                if(!node.TryGetProperty("identifier",out var id)||!Regex.IsMatch(id.GetString()??"","^[A-Za-z0-9_]{1,96}$"))return false;
+                if(!node.TryGetProperty("identifier",out var id)||(!Regex.IsMatch(id.GetString()??"","^[A-Za-z0-9_]{1,96}$")&&!NightStud.Shared.GearCatalogue.Contains(id.GetString()??"")))return false;
                 if(!node.TryGetProperty("unitCount",out var count)||!count.TryGetInt32(out int n)||n is <1 or >1000)return false;
             }
             return !payload.Contains("$type",StringComparison.OrdinalIgnoreCase);

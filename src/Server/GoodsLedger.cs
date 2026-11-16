@@ -15,7 +15,7 @@ public sealed class GoodsLedger
     public static IReadOnlyDictionary<string,Kind> Catalogue=>catalogue;
     static Dictionary<string,Kind> LoadCatalogue(){
         using var stream=typeof(GoodsLedger).Assembly.GetManifestResourceStream("NightStud.Server.stake-catalogue.json")!;
-        using var doc=JsonDocument.Parse(stream);return doc.RootElement.GetProperty("items").EnumerateArray().Select(i=>new Kind(i.GetProperty("id").GetString()!,i.GetProperty("label").GetString()!,i.GetProperty("atlas").GetString()!,i.GetProperty("sprite").GetString()!,i.GetProperty("baseValue").GetInt32())).ToDictionary(k=>k.Id);
+        using var doc=JsonDocument.Parse(stream);var result=doc.RootElement.GetProperty("items").EnumerateArray().Select(i=>new Kind(i.GetProperty("id").GetString()!,i.GetProperty("label").GetString()!,i.GetProperty("atlas").GetString()!,i.GetProperty("sprite").GetString()!,i.GetProperty("baseValue").GetInt32())).ToDictionary(k=>k.Id);foreach(var g in NightStud.Shared.GearCatalogue.All)result[g.Identifier]=new(g.Identifier,g.Name,"night_stud",g.Icon,g.Price);return result;
     }
     static void Need([System.Diagnostics.CodeAnalysis.DoesNotReturnIf(false)] bool ok,string code,string message){if(!ok)throw new WireFault(code,message);}
     static SqliteCommand Cmd(SqliteConnection db,SqliteTransaction? tx,string sql,params (string,object)[] args){var c=db.CreateCommand();c.Transaction=tx;c.CommandText=sql;foreach(var p in args)c.Parameters.AddWithValue(p.Item1,p.Item2);return c;}

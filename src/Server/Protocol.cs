@@ -63,6 +63,7 @@ public sealed class Command
     public bool AllowMessages {get;set;}=true;
     public bool AllowCalls {get;set;}=true;
     public bool Blocked {get;set;}
+    public string Number {get;set;}="";
     public string Call {get;set;}="";
     public long Sequence {get;set;}
     public string Text { get; set; }="";

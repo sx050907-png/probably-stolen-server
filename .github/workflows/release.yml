@@ -18,6 +18,12 @@ jobs:
           dotnet-version: '10.0.x'
       - name: Verify service recovery
         run: dotnet run --project src/ServiceTests/NightStud.ServiceTests.csproj -c Release -- work/release-service src/Server/bin/Release/net10.0/NightStud.Server.dll
+      - name: Account numbers and durable player marketplace
+        run: dotnet run --project src/PhoneMarketTests/NightStud.PhoneMarketTests.csproj -c Release -- work/phone-market-test
+      - name: Real WebSocket phone, market and restart integration
+        env:
+          RUNNER_DOTNET: dotnet
+        run: dotnet run --project src/PhoneMarketTcpTests/NightStud.PhoneMarketTcpTests.csproj -c Release -- work/phone-market-tcp-test src/Server/bin/Release/net10.0/NightStud.Server.dll
       - name: Build portable downloads
         run: python3 scripts/package.py --output release
       - name: Verify Simpfun start.sh-only install and update

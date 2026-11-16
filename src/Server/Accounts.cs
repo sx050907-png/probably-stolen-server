@@ -34,6 +34,7 @@ public sealed class Accounts
                 CREATE TABLE IF NOT EXISTS account_appearance(account TEXT PRIMARY KEY, style TEXT NOT NULL);
                 """;cmd.ExecuteNonQuery();
         }
+        _ = new PlayerPhones(this);
         if(!OperatingSystem.IsWindows())File.SetUnixFileMode(path,UnixFileMode.UserRead|UnixFileMode.UserWrite);
     }
     public SqliteConnection Open(){var db=new SqliteConnection(connectionString);db.Open();return db;}

@@ -11,7 +11,8 @@ string root=args.FirstOrDefault()??Path.Combine("work","cash050-"+Id());Director
 var accounts=new Accounts(Path.Combine(root,"ledger"));var ledger=new StakeLedger(accounts);string a=Id(),b=Id(),save=Id();
 var goodsLedger=new GoodsLedger(accounts);var kind=GoodsLedger.Catalogue["processed_juice"];
 string Lot(string identifier="processed_juice",string key="")=>Wire.Encode(new{label="样本",nodes=new[]{new{identifier,unitCount=1,children=Array.Empty<int>(),slots=Array.Empty<int>(),tags=key.Length==0?Array.Empty<object>():new object[]{new{key}},shape=(string?)null,modified=(string?)null}}});
-string fixtureLot=Lot();Check(GoodsLedger.Catalogue.Count==443,"catalogue exported from current native game excluding semantic plot lots");
+string fixtureLot=Lot();Check(GoodsLedger.Catalogue.Keys.Except(NightStud.Shared.GearCatalogue.All.Select(g=>g.Identifier)).Count()==443,"native catalogue still contains exactly the exported non-story items");
+Check(NightStud.Shared.GearCatalogue.All.All(g=>GoodsLedger.Catalogue.TryGetValue(g.Identifier,out var kind)&&kind.BaseValue==g.Price),"all ten physical devices are explicitly listed with their declared base values");
 foreach(string plot in new[]{"lou_locker","lou_etched_round","luxury_supply_crate"})Fault(()=>GoodsLedger.Validate(Lot(plot)),"protected_lot");
 if(args.Length>1)Check(GoodsLedger.Validate(File.ReadAllText(args[1])).Id=="processed_juice","actual native generated item document accepted by server");
 Check(GoodsLedger.Validate(fixtureLot).Id=="processed_juice","ordinary native goods accepted");Fault(()=>GoodsLedger.Validate(Lot("unknown_quest_item")),"protected_lot");Fault(()=>GoodsLedger.Validate(Lot(key:"questbound")),"protected_lot");

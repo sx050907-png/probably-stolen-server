@@ -2,17 +2,19 @@ namespace NightStud.Server;
 
 public sealed partial class RoomHub {
     readonly ContactStore? contacts=accounts==null?null:new(accounts);
-    sealed class PhoneCall(string from,string to){public readonly string Id=Guid.NewGuid().ToString("N");public string From=from,To=to,State="ringing";public DateTime Expires=DateTime.UtcNow.AddSeconds(25);}
+    readonly PlayerPhones? phones=accounts==null?null:new(accounts);
+    readonly Dictionary<string,DateTime> phoneDialCooldown=new();
+    sealed class PhoneCall(string from,string to){public readonly string Id=Guid.NewGuid().ToString("N");public string From=from,To=to,State="ringing";public DateTime Expires=DateTime.UtcNow.AddSeconds(20);}
     readonly Dictionary<string,PhoneCall> phoneCalls=new();
     readonly Dictionary<string,DateTime> phoneCooldown=new();
     DateTime contactPrune=DateTime.UtcNow;
     void ContactAccess(Session session)=>Need(session.AccountId!=null&&contacts!=null,"account_required","登录服务器账号后可使用联络功能。");
     void ContactPeer(Session session,string peer){ContactAccess(session);Need(peer!=session.Id&&peer.Length<=64&&contacts!.Identity(peer)!=null,"contact_unavailable","暂时无法联系这位玩家。");Need(moderation?.Banned(peer)!=true&&!contacts!.Blocked(peer,session.Id)&&!contacts.Blocked(session.Id,peer),"contact_unavailable","暂时无法联系这位玩家。");}
-    void SendContacts(Session session){if(session.Contacts&&session.AccountId!=null&&contacts!=null)session.Client?.Send(new{type="contacts",settings=contacts.Settings(session.Id),threads=contacts.Threads(session.Id),unread=contacts.Unread(session.Id)});}
+    void SendContacts(Session session){if(session.Contacts&&session.AccountId!=null&&contacts!=null)session.Client?.Send(new{type="contacts",settings=contacts.Settings(session.Id),threads=contacts.Threads(session.Id),unread=contacts.Unread(session.Id),number=phones?.Number(session.Id)??"",calls=phones?.History(session.Id)??Array.Empty<object>()});}
     void SendCall(PhoneCall call,string state,string reason=""){
-        foreach(string id in new[]{call.From,call.To})if(FindPlayer(id) is {Contacts:true} session){string peer=id==call.From?call.To:call.From;session.Client?.Send(new{type="phone",id=call.Id,state,reason,incoming=id==call.To,peer,name=contacts?.Identity(peer)?.Name??"玩家",expires=call.Expires});}
+        foreach(string id in new[]{call.From,call.To})if(FindPlayer(id) is {Contacts:true} session){string peer=id==call.From?call.To:call.From;session.Client?.Send(new{type="phone",id=call.Id,state,reason,incoming=id==call.To,peer,name=contacts?.Identity(peer)?.Name??"玩家",number=phones?.Number(peer)??"",expires=call.Expires});}
     }
-    void EndCall(PhoneCall call,string reason){phoneCalls.Remove(call.Id);SendCall(call,"ended",reason);}
+    void EndCall(PhoneCall call,string reason){phoneCalls.Remove(call.Id);phones?.Record(call.Id,call.From,call.To,call.State=="connected",reason);SendCall(call,"ended",reason);foreach(var id in new[]{call.From,call.To})if(FindPlayer(id) is {} s)SendContacts(s);}
     void EndPhoneFor(string id,string reason){foreach(var call in phoneCalls.Values.Where(c=>c.From==id||c.To==id).ToArray())EndCall(call,reason);}
     void ExpireContacts(DateTime now){foreach(var call in phoneCalls.Values.Where(c=>c.Expires<=now).ToArray())EndCall(call,call.State=="ringing"?"missed":"timeout");foreach(var key in phoneCooldown.Where(p=>(now-p.Value).TotalMinutes>5).Select(p=>p.Key).ToArray())phoneCooldown.Remove(key);if(now>=contactPrune){contacts?.Prune();contactPrune=now.AddMinutes(5);}}
     void ContactCommand(Session session,Command command){
@@ -20,6 +22,16 @@ public sealed partial class RoomHub {
         Need(command.Target!=null&&command.Target.Length<=64&&command.Call!=null&&command.Call.Length<=64&&command.Receipt!=null&&command.Receipt.Length<=64&&command.Text!=null,"bad_message","联络消息格式无效。");
         ExpireContacts(DateTime.UtcNow);string peer=command.Target;
         if(command.Type=="contacts"){SendContacts(session);return;}
+        if(command.Type=="phoneRead"){phones!.Read(session.Id);SendContacts(session);return;}
+        if(command.Type=="phoneDial"){
+            Need(!phoneCalls.Values.Any(c=>c.From==session.Id||c.To==session.Id),"call_busy","请先结束当前通话。");
+            Need(!phoneDialCooldown.TryGetValue(session.Id,out var lastDial)||(DateTime.UtcNow-lastDial).TotalSeconds>=2,"call_rate","请稍等片刻再拨号。");
+            phoneDialCooldown[session.Id]=DateTime.UtcNow;
+            if(phoneDialCooldown.Count>1000)foreach(var key in phoneDialCooldown.Where(p=>(DateTime.UtcNow-p.Value).TotalMinutes>5).Select(p=>p.Key).ToArray())phoneDialCooldown.Remove(key);
+            var target=phones!.Resolve(command.Number);Need(target!=null,"number_missing","这个号码还没有人使用。");peer=target!.Id;
+            ContactPeer(session,peer);
+            session.Client!.Send(new{type="phoneResolved",peer,name=target.Name,number=phones.Number(peer)});
+        }
         if(command.Type=="contactReceipt"){
             Need(command.Receipt.Length is >0 and <=64,"bad_message","消息编号无效。");var saved=contacts!.Existing(session.Id,command.Receipt);
             if(saved!=null)session.Client!.Send(new{type="contactMessage",message=saved});else session.Client!.Send(new{type="contactMissing",id=command.Receipt});return;
@@ -42,7 +54,7 @@ public sealed partial class RoomHub {
             Need(phoneCalls.TryGetValue(command.Call,out var call)&&call.To==session.Id&&call.State=="ringing","call_unavailable","来电已经结束。");ContactPeer(session,call!.From);Need(contacts!.Settings(session.Id).AllowCalls,"calls_disabled","你已开启来电免打扰。");call.State="connected";call.Expires=DateTime.UtcNow.AddHours(1);SendCall(call,"connected");return;
         }
         ContactPeer(session,peer);
-        if(command.Type=="phoneStart"){
+        if(command.Type=="phoneStart"||command.Type=="phoneDial"){
             Need(contacts!.Settings(peer).AllowCalls,"contact_unavailable","对方暂不接听来电，可改为留言。");var recipient=FindPlayer(peer);Need(recipient!=null&&Online(recipient)&&recipient.Contacts,"contact_unavailable","对方离线或联络功能不可用，可改为留言。");
             Need(!phoneCalls.Values.Any(c=>c.From==session.Id||c.To==session.Id||c.From==peer||c.To==peer),"call_busy","你或对方正在通话。");
             Need(!phoneCooldown.TryGetValue(session.Id,out var recent)||(DateTime.UtcNow-recent).TotalSeconds>=30,"call_rate","请稍等片刻再拨号。");phoneCooldown[session.Id]=DateTime.UtcNow;
