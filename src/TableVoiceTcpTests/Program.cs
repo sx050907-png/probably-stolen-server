@@ -50,9 +50,20 @@ try{
    await p.Wait(f=>f.GetProperty("type").GetString()=="state"&&f.GetProperty("room").ValueKind==JsonValueKind.Object&&f.GetProperty("room").GetProperty("code").GetString()==code);
   }
   foreach(var p in seated)await p.Wait(f=>f.GetProperty("type").GetString()=="state"&&f.GetProperty("room").ValueKind==JsonValueKind.Object&&f.GetProperty("room").GetProperty("code").GetString()==code&&f.GetProperty("room").GetProperty("players").EnumerateArray().All(s=>s.ValueKind==JsonValueKind.Object));
-  foreach(var p in seated)Check((await Table(p,"ready")).GetProperty("ok").GetBoolean(),"ready "+mode);
-  foreach(var p in seated)await p.Wait(f=>f.GetProperty("type").GetString()=="state"&&f.GetProperty("room").ValueKind==JsonValueKind.Object&&f.GetProperty("room").GetProperty("code").GetString()==code&&f.GetProperty("room").GetProperty("phase").GetString()=="playing");
-  var room=seated[0].Last("state").GetProperty("room");Check(room.GetProperty("phase").GetString()=="playing","real WebSocket peers start "+mode);
+  JsonElement room=default;
+  for(int opening=0;opening<32;opening++){
+   int previous=seated[0].Last("state").GetProperty("room").GetProperty("hand").GetInt32();
+   foreach(var p in seated)Check((await Table(p,"ready")).GetProperty("ok").GetBoolean(),"ready "+mode);
+   var started=await seated[0].Wait(f=>f.GetProperty("type").GetString()=="state"&&f.GetProperty("room").ValueKind==JsonValueKind.Object&&f.GetProperty("room").GetProperty("code").GetString()==code&&f.GetProperty("room").GetProperty("hand").GetInt32()>previous);
+   int hand=started.GetProperty("room").GetProperty("hand").GetInt32();
+   foreach(var p in seated)await p.Wait(f=>f.GetProperty("type").GetString()=="state"&&f.GetProperty("room").ValueKind==JsonValueKind.Object&&f.GetProperty("room").GetProperty("code").GetString()==code&&f.GetProperty("room").GetProperty("hand").GetInt32()==hand&&f.GetProperty("room").GetProperty("phase").GetString() is "playing" or "finished");
+   room=seated[0].Last("state").GetProperty("room");if(room.GetProperty("phase").GetString()=="playing")break;
+   // A natural blackjack legitimately finishes before a playing snapshot.
+   // Validate that state, then start another legal hand for the voice checks.
+   Check(mode=="blackjack"&&room.GetProperty("phase").GetString()=="finished"&&room.GetProperty("actor").GetInt32()==-1,"natural opening completes without an action turn");
+   var finished=await Table(seated[0],"tablePhrase",new(){["move"]="say:wait"});Check(!finished.GetProperty("ok").GetBoolean()&&finished.GetProperty("error").GetString()=="not_playing","finished natural hand rejects table voice");
+  }
+  Check(room.GetProperty("phase").GetString()=="playing","real WebSocket peers start "+mode);
   File.WriteAllText(Path.Combine(directory,mode+"-playing.json"),seated[0].Last("state").GetRawText());
   int actor=room.GetProperty("actor").GetInt32(),speaker=(actor+1)%capacity;long revision=room.GetProperty("revision").GetInt64();string phrase=mode=="landlord"?"coffee":"show";
   Check((await Table(seated[speaker],"tablePhrase",new(){["move"]="say:"+phrase})).GetProperty("ok").GetBoolean(),"off-turn manual voice accepted "+mode);
