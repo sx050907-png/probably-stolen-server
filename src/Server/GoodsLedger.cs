@@ -43,12 +43,15 @@ public sealed class GoodsLedger
                 var tags=node.GetProperty("tags");Need(tags.ValueKind==JsonValueKind.Array&&tags.GetArrayLength()<=96,"bad_lot","押品状态超出范围。");
                 foreach(var tag in tags.EnumerateArray()){
                     string key=tag.GetProperty("key").GetString()??"";Need(key.Length<=128&&!Story.Any(m=>key.Contains(m,StringComparison.OrdinalIgnoreCase)),"protected_lot","剧情物品受保护，无法上桌。");
-                    if(key==NightStud.Shared.GearCatalogue.RemainingTag){var spec=NightStud.Shared.GearCatalogue.Find(kind!.Id);Need(spec?.Durable==true&&tag.TryGetProperty("number",out var wear)&&wear.TryGetInt32(out int remaining)&&remaining>=1&&remaining<=spec.Uses,"bad_lot","装置耐久数据无效。");}
+                    if(key==NightStud.Shared.GearCatalogue.RemainingTag){var spec=NightStud.Shared.GearCatalogue.Find(kind!.Id);Need(spec?.Durable==true&&tag.TryGetProperty("number",out var wear)&&wear.TryGetInt32(out int remaining)&&remaining>=(spec.Repairable?0:1)&&remaining<=spec.Uses&&(remaining!=0||tag.TryGetProperty("text",out var marker)&&marker.ValueKind==JsonValueKind.String&&marker.GetString()=="0"),"bad_lot","装置耐久数据无效。");}
+                    if(key==NightStud.Shared.GearCatalogue.ChargeTag){var spec=NightStud.Shared.GearCatalogue.Find(kind!.Id);Need(spec?.Rechargeable==true&&tag.TryGetProperty("number",out var energy)&&energy.TryGetInt32(out int charge)&&charge>=0&&charge<=spec.ChargeCapacity&&(charge!=0||tag.TryGetProperty("text",out var marker)&&marker.ValueKind==JsonValueKind.String&&marker.GetString()=="0"),"bad_lot","装置电量数据无效。");}
                     foreach(var p in tag.EnumerateObject()){
                         Need(p.Value.ValueKind!=JsonValueKind.String||p.Value.GetString()!.Length<=(p.Name=="text"?512:128),"bad_lot","押品状态文本过长。");
                         Need(p.Value.ValueKind!=JsonValueKind.Number||p.Value.TryGetDouble(out double v)&&double.IsFinite(v),"bad_lot","押品数值无效。");
                     }
                 }
+                var gear=NightStud.Shared.GearCatalogue.Find(kind!.Id);
+                if(gear?.Repairable==true)Need(units==1&&tags.EnumerateArray().Count(t=>t.GetProperty("key").GetString()==NightStud.Shared.GearCatalogue.RemainingTag)==1&&(!gear.Rechargeable||tags.EnumerateArray().Count(t=>t.GetProperty("key").GetString()==NightStud.Shared.GearCatalogue.ChargeTag)==1),"bad_lot","装置状态不完整。");
                 foreach(string key in new[]{"shape","modified"})if(node.TryGetProperty(key,out var shape)&&shape.ValueKind!=JsonValueKind.Null){Need(shape.ValueKind==JsonValueKind.String&&shape.GetString()!.Length<=2000,"bad_lot","押品形状超出范围。");using var parsed=JsonDocument.Parse(shape.GetString()!,new JsonDocumentOptions{MaxDepth=10});Need(parsed.RootElement.ValueKind==JsonValueKind.Object,"bad_lot","押品形状无效。");}
                 index++;
             }

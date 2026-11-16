@@ -51,6 +51,22 @@ string worn=payload.Replace("基础绷带","茶色镜 [3/8]").Replace("bandage_i
 string wornId=Id();market.Offer(a.Id,saveA,wornId,worn,30);Check(market.Preview(wornId)!.Payload==worn,"worn equipment payload is retained byte for byte");
 var wornSale=market.Buy(b.Id,saveB,wornId,30);Check(wornSale.Payload==worn&&new MarketLedger(new Accounts(data)).Status(b.Id,saveB,wornId)!.Payload==worn,"selling and restarting never refill equipment durability");
 foreach(int invalid in new[]{0,-1,9,int.MaxValue})Reject(()=>GoodsLedger.Validate(worn.Replace("\"number\":3","\"number\":"+invalid)),"bad_lot");
+// Maintenance equipment is a single physical tool, including broken and empty states.
+foreach(var reader in new[]{("durableLens",12,0),("chargedLens",60,24)}){
+ string Wear(int n)=>"{\"key\":\"night_stud.gear.remaining.v1\",\"number\":"+n+",\"text\":\""+n+"\"}";
+ string Charge(int n)=>"{\"key\":\"night_stud.gear.charge.v1\",\"number\":"+n+",\"text\":\""+n+"\"}";
+ string Reader(string tags,int units=1)=>payload.Replace("bandage_item","night_stud.gear."+reader.Item1).Replace("\"unitCount\":1","\"unitCount\":"+units).Replace("\"tags\":[]","\"tags\":["+tags+"]");
+ string emptyTags=Wear(0)+(reader.Item3>0?","+Charge(0):"");string empty=Reader(emptyTags);
+ Check(GoodsLedger.Validate(empty).Id=="night_stud.gear."+reader.Item1,"broken and empty reader validates with explicit zero markers");
+ string id=Id();market.Offer(a.Id,saveA,id,empty,1);Check(market.Buy(b.Id,saveB,id,1).Payload==empty,"empty reader trades without replacement or refill");
+ Check(new MarketLedger(new Accounts(data)).Status(b.Id,saveB,id)!.Payload==empty,"empty reader retains exact counters after restart");
+ market.Buy(b.Id,saveB,id,1);Check(market.Status(b.Id,saveB,id)!.Payload==empty,"purchase retry cannot reset equipment state");market.Delivered(b.Id,saveB,id);
+ foreach(int n in new[]{-1,reader.Item2+1,int.MaxValue})Reject(()=>GoodsLedger.Validate(Reader(Wear(n)+(reader.Item3>0?","+Charge(0):""))),"bad_lot");
+ Reject(()=>GoodsLedger.Validate(Reader("")),"bad_lot");Reject(()=>GoodsLedger.Validate(Reader(emptyTags,2)),"bad_lot");Reject(()=>GoodsLedger.Validate(Reader(emptyTags+","+Wear(0))),"bad_lot");
+ Reject(()=>GoodsLedger.Validate(empty.Replace("\"text\":\"0\"","\"text\":\"\"")),"bad_lot");
+ if(reader.Item3>0){foreach(int n in new[]{-1,25,int.MaxValue})Reject(()=>GoodsLedger.Validate(Reader(Wear(3)+","+Charge(n))),"bad_lot");Reject(()=>GoodsLedger.Validate(Reader(Wear(3))),"bad_lot");Reject(()=>GoodsLedger.Validate(Reader(emptyTags+","+Charge(0))),"bad_lot");}
+ else Reject(()=>GoodsLedger.Validate(Reader(emptyTags+","+Charge(0))),"bad_lot");
+}
 Check(GoodsLedger.Validate(tech).Id=="night_stud.gear.phaseLens","legacy single-use supplies without durability remain compatible");
 Reject(()=>market.Offer(a.Id,saveA,Id(),payload.Replace("bandage_item","lou_locker"),1),"protected_lot");
 Check((await one.Do("marketBrowse",new(){SaveId=saveA,Direction="buy",Choice=0})).GetProperty("ok").GetBoolean(),"production market routing exposes summaries without item payloads");
