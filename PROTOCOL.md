@@ -224,3 +224,10 @@ marketBrowse / marketPreview 读取公开上架摘要与单件详情。marketOff
 marketCancel / marketStatus / marketDelivered 凭账号、原服务器和 saveId 恢复；缺失上架取消时先写 tombstone，迟到的上传不能复活已返还货物。售出货物只能由买家、取消货物只能由原卖家取回。客户端先持久保存本地领货凭证及恢复记录，成功后才发送 marketDelivered；收到该回执后服务器才清除已交付资料。重复请求幂等，未交付货物跨重启保留。
 
 physicalGear 仅扩充十个 GearCatalogue 的 night_stud.gear.* 精确标识，复用原 typed goods 编解码、寄售及押注规则；不会放开任意模组 ID、精灵路径或剧情物品。客户端付费旧数量先保存迁移记录，再发实际物品；写盘失败保留旧计数。
+
+
+## 0.8.1：设备耐久
+
+新增 gearDurability 能力。八种耐用设备采用 night_stud.gear.remaining.v1 状态，number 为剩余使用次数；虹膜片和听线针保持单次消耗。服务端验证带此状态的物品必须为对应耐用设备，且剩余值在 1..Uses 范围，拒绝负数、零和超上限值。原有无状态的旧设备兼容为全新。
+
+耐久随原有 typed payload 一并保存、发货；寄售、交易、服务器重启和重试不重新生成设备状态，也不补满耐久。旧 0.8.0 服务端已能原样传递该状态，推荐升级以获得范围校验。物品标识、价格、形状与结算协议不变。普通 AI 现金不足时的多件实物合并支付由核心 0.51.1 本地账本处理，不影响多人真人房的规则。

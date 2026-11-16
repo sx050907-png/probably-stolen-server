@@ -43,6 +43,7 @@ public sealed class GoodsLedger
                 var tags=node.GetProperty("tags");Need(tags.ValueKind==JsonValueKind.Array&&tags.GetArrayLength()<=96,"bad_lot","押品状态超出范围。");
                 foreach(var tag in tags.EnumerateArray()){
                     string key=tag.GetProperty("key").GetString()??"";Need(key.Length<=128&&!Story.Any(m=>key.Contains(m,StringComparison.OrdinalIgnoreCase)),"protected_lot","剧情物品受保护，无法上桌。");
+                    if(key==NightStud.Shared.GearCatalogue.RemainingTag){var spec=NightStud.Shared.GearCatalogue.Find(kind!.Id);Need(spec?.Durable==true&&tag.TryGetProperty("number",out var wear)&&wear.TryGetInt32(out int remaining)&&remaining>=1&&remaining<=spec.Uses,"bad_lot","装置耐久数据无效。");}
                     foreach(var p in tag.EnumerateObject()){
                         Need(p.Value.ValueKind!=JsonValueKind.String||p.Value.GetString()!.Length<=(p.Name=="text"?512:128),"bad_lot","押品状态文本过长。");
                         Need(p.Value.ValueKind!=JsonValueKind.Number||p.Value.TryGetDouble(out double v)&&double.IsFinite(v),"bad_lot","押品数值无效。");

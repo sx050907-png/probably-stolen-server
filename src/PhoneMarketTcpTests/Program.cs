@@ -31,7 +31,7 @@ try{
  await b.DisposeAsync();b=null;var offline=await a.Do("contactSend",new(){["target"]=a.Last("contactMessage").GetProperty("message").GetProperty("recipient").GetString(),["text"]="重启后也应保留的留言"});Check(offline.GetProperty("ok").GetBoolean(),"offline message acknowledged");
 
  string sellerId=a.Id,saveA=new string('1',32),saveB=new string('2',32),saveC=new string('3',32),marketId=Guid.NewGuid().ToString("N");
- string parcel="""{"label":"虹膜片","nodes":[{"identifier":"night_stud.gear.phaseLens","unitCount":1,"children":[],"slots":[],"tags":[],"shape":null,"modified":null}]}""";
+ string parcel="""{"label":"茶色镜 [3/8]","nodes":[{"identifier":"night_stud.gear.tintFilter","unitCount":1,"children":[],"slots":[],"tags":[{"key":"night_stud.gear.remaining.v1","number":3}],"shape":null,"modified":null}]}""";
  Check((await a.Do("marketOffer",new(){["saveId"]=saveA,["trade"]=marketId,["payload"]=parcel,["price"]=130})).GetProperty("ok").GetBoolean(),"actual TCP uploads a real device into market escrow");
  string originalPhone=a.Last("welcome").GetProperty("phone").GetString()!;
  await a.DisposeAsync();a=null;await c.DisposeAsync();c=null;await Stop();await Start();

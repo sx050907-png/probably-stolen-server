@@ -92,7 +92,7 @@ public sealed partial class RoomHub(int graceSeconds, Action<ServerEvent>? audit
     readonly Dictionary<string, Invitation> invitations = new();
     readonly Dictionary<string, DateTime> inviteCooldown = new();
     sealed record Invitation(string Id,string From,string To,string Code,DateTime Expires);
-    public static readonly string[] Features={"lobby","invitations","stud","three","holdem","blackjack","landlord","mahjong","dice","bots","accounts","privacy","playerFilter","chat","visits","trades","storeStakes","goodsStakes","sharedShop","shopReception","roundGoods","groupGoods","shopBell","shopDisplay","shopCounter","tradeBatch","shopCounterBatch","higherStakes","contacts","playerPhones","playerMarket","physicalGear","landlordBanter","tableVoice","tableVoiceAllModes"};
+    public static readonly string[] Features={"lobby","invitations","stud","three","holdem","blackjack","landlord","mahjong","dice","bots","accounts","privacy","playerFilter","chat","visits","trades","storeStakes","goodsStakes","sharedShop","shopReception","roundGoods","groupGoods","shopBell","shopDisplay","shopCounter","tradeBatch","shopCounterBatch","higherStakes","contacts","playerPhones","playerMarket","physicalGear","gearDurability","landlordBanter","tableVoice","tableVoiceAllModes"};
     void Audit(string name,Session session,Room? room=null,string? reason=null)=>audit?.Invoke(new ServerEvent(name,session.Id,room?.Code,room?.Mode,reason));
     static void FundsRate(Session session){
         var now=DateTime.UtcNow;if((now-session.FundsSince).TotalMinutes>=1){session.FundsSince=now;session.FundsCount=0;}

@@ -47,6 +47,11 @@ Check(winners==1&&cash.Balance(a.Id,saveA)==250,"two simultaneous buyers produce
 string tooExpensive=Id();market.Offer(a.Id,saveA,tooExpensive,payload,999999);Reject(()=>market.Buy(b.Id,saveB,tooExpensive,999999),"cash_balance");Check(market.Preview(tooExpensive)?.State=="listed","insufficient funds rolls back without consuming the item");
 string expired=Id();market.Offer(a.Id,saveA,expired,payload,50);using(var db=accounts.Open()){using var cmd=db.CreateCommand();cmd.CommandText="UPDATE market_listings SET expires='2020-01-01' WHERE id=$i";cmd.Parameters.AddWithValue("$i",expired);cmd.ExecuteNonQuery();}Check(market.Status(a.Id,saveA,expired)!.State=="cancelled","expired listings become returnable rather than destroying the physical item");
 string tech=payload.Replace("基础绷带","虹膜片").Replace("bandage_item","night_stud.gear.phaseLens");Check(market.Offer(a.Id,saveA,Id(),tech,80).Kind=="night_stud.gear.phaseLens","the real technology item survives typed marketplace validation");
+string worn=payload.Replace("基础绷带","茶色镜 [3/8]").Replace("bandage_item","night_stud.gear.tintFilter").Replace("\"tags\":[]","\"tags\":[{\"key\":\"night_stud.gear.remaining.v1\",\"number\":3}]");
+string wornId=Id();market.Offer(a.Id,saveA,wornId,worn,30);Check(market.Preview(wornId)!.Payload==worn,"worn equipment payload is retained byte for byte");
+var wornSale=market.Buy(b.Id,saveB,wornId,30);Check(wornSale.Payload==worn&&new MarketLedger(new Accounts(data)).Status(b.Id,saveB,wornId)!.Payload==worn,"selling and restarting never refill equipment durability");
+foreach(int invalid in new[]{0,-1,9,int.MaxValue})Reject(()=>GoodsLedger.Validate(worn.Replace("\"number\":3","\"number\":"+invalid)),"bad_lot");
+Check(GoodsLedger.Validate(tech).Id=="night_stud.gear.phaseLens","legacy single-use supplies without durability remain compatible");
 Reject(()=>market.Offer(a.Id,saveA,Id(),payload.Replace("bandage_item","lou_locker"),1),"protected_lot");
 Check((await one.Do("marketBrowse",new(){SaveId=saveA,Direction="buy",Choice=0})).GetProperty("ok").GetBoolean(),"production market routing exposes summaries without item payloads");
 Check(!one.Last("market").GetProperty("items")[0].TryGetProperty("payload",out _),"market browsing keeps full item trees out of every summary frame");
