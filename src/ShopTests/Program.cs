@@ -133,7 +133,7 @@ await Ok(owner,"leave");await Publish(owner,scene);await Ok(visitor,"visit",c=>c
 await Ok(outsider,"privacy",c=>c.AllowVisits=true);await Publish(outsider,scene);
 await Ok(owner,"visit",c=>c.Target=outsider.Session.Id);await visitor.Flush();
 Check(visitor.Last("visit").GetProperty("host").ValueKind==JsonValueKind.Null,"host visiting elsewhere ends own reception");
-await No(visitor,"visit","visits_disabled",c=>c.Target=owner.Session.Id);
+await No(visitor,"visit","shop_away",c=>c.Target=owner.Session.Id);
 await Ok(owner,"leaveVisit");await Publish(owner,scene);await Ok(visitor,"visit",c=>c.Target=owner.Session.Id);
 // Independent concurrent inquiries must not be consumed or cancelled together.
 await Ok(third,"visit",c=>c.Target=owner.Session.Id);await owner.Flush();
@@ -186,8 +186,43 @@ hub.Logout(owner.Session.Token);await visitor.Flush();
 Check(visitor.Last("visit").GetProperty("host").ValueKind==JsonValueKind.Null,"host logout releases guests immediately");
 await No(visitor,"shopEnter","visit_unavailable",c=>c.SceneRevision=1);
 await ReceptionChecks();
+await ShopHoursChecks();
 await IncomingTradeChecks();
 await AppearanceChecks();
+async Task ShopHoursChecks(){
+    await using var host=await Make("hours_owner",reception:true);
+    await using var guest=await Make("hours_guest",reception:true);
+    var state=Copy();state.Generation=Guid.NewGuid().ToString("N");state.CounterBusy=true;state.DoorOpen=true;
+    await Ok(host,"privacy",cmd=>cmd.AllowVisits=true);
+    async Task CheckListing(bool enabled,bool ready){
+        await guest.Flush();
+        var row=guest.Last("lobby").GetProperty("players").EnumerateArray().Single(p=>p.GetProperty("id").GetString()==host.Session.Id);
+        Check(row.GetProperty("visitsEnabled").GetBoolean()==enabled&&row.GetProperty("allowVisits").GetBoolean()==ready,"observer sees permission and live scene separately");
+    }
+    await CheckListing(true,false);
+    await No(guest,"visit","shop_syncing",cmd=>cmd.Target=host.Session.Id);
+    await Ok(host,"privacy",cmd=>cmd.AllowVisits=false);await CheckListing(false,false);
+    await No(guest,"visit","visits_disabled",cmd=>cmd.Target=host.Session.Id);
+    await Ok(host,"privacy",cmd=>cmd.AllowVisits=true);await CheckListing(true,false);
+    await No(host,"shopHours","bad_hours",cmd=>cmd.Text="open");
+    await Ok(guest,"shopHours",cmd=>cmd.Text="away");
+    await Publish(host,state);await CheckListing(true,true);await Ok(guest,"visit",cmd=>cmd.Target=host.Session.Id);
+    Check(guest.Last("shopScene").GetProperty("serving").GetString()=="","guest arriving from casino waits for native customers");
+    await No(guest,"shopEnter","counter_busy",cmd=>cmd.SceneRevision=Rev(guest));
+    state.CounterBusy=false;await Publish(host,state);await guest.Flush();
+    Check(guest.Last("shopScene").GetProperty("serving").GetString()==guest.Session.Id,"native queue drained, waiting guest at counter");
+    await Ok(guest,"shopEnter",cmd=>cmd.SceneRevision=Rev(guest));
+    foreach(string hours in new[]{"closed","away"}){
+        await Ok(host,"shopHours",cmd=>cmd.Text=hours);await guest.Flush();
+        var frame=guest.Last("visit");
+        Check(frame.GetProperty("host").ValueKind==JsonValueKind.Null&&frame.GetProperty("reason").GetString()==hours,"guest receives end-of-visit reason "+hours);
+        var listing=guest.Last("lobby").GetProperty("players").EnumerateArray().Single(p=>p.GetProperty("id").GetString()==host.Session.Id);
+        Check(!listing.GetProperty("allowVisits").GetBoolean()&&listing.GetProperty("shopHours").GetString()==hours,"directory explains why visiting is unavailable "+hours);
+        await No(guest,"visit","shop_"+hours,cmd=>cmd.Target=host.Session.Id);
+        await Ok(host,"shopHours",cmd=>cmd.Text=hours);
+        await Publish(host,state);await CheckListing(true,true);await Ok(guest,"visit",cmd=>cmd.Target=host.Session.Id);
+    }
+}
 async Task AppearanceChecks(){
     await using var h=await Make("look_owner",reception:true);await using var v=await Make("look_visitor",reception:true);
     var state=Copy();state.Generation=Guid.NewGuid().ToString("N");state.CounterBusy=false;
@@ -242,6 +277,8 @@ async Task ReceptionChecks(){
     Check(h.Last("shopScene").GetProperty("reception").GetBoolean(),"host opted into authoritative reception");
     foreach(var p in new[]{a,b,c})await Ok(p,"visit",cmd=>cmd.Target=h.Session.Id);
     await h.Flush();Check(Serving(h)==a.Session.Id&&Serving(c)==a.Session.Id,"oldest visitor serves first for host and every guest");
+    await Ok(a,"visit",cmd=>cmd.Target=h.Session.Id);await h.Flush();
+    Check(Serving(h)==a.Session.Id&&Person(h,b.Session.Id).GetProperty("queuePosition").GetInt32()==1,"duplicate visit preserves active guest and waiting order");
     Check(Person(b,b.Session.Id).GetProperty("queuePosition").GetInt32()==1&&Person(c,c.Session.Id).GetProperty("queuePosition").GetInt32()==2,"waiting positions ordered by arrival");
     Check(h.Last("shopScene").GetProperty("people").EnumerateArray().Count(p=>p.GetProperty("serving").GetBoolean())==1,"one serving visitor in authoritative scene");
     await No(a,"shopServe","visit_scope",cmd=>Select(cmd,h,a.Session.Id));

@@ -63,10 +63,11 @@ namespace NightStud
             if(claims.TryGetValue(next,out int chow)&&chow>=0){Meld(next,chow,3,false);return;}
             Draw(next);
         }
-        internal int OnlineSuggestion(){
-            var h=Hands[Turn];int s=Turn;
-            int Value(int t)=>h.Sum(x=>x==t?6:x>=27||t>=27||x/9!=t/9?0:Math.Abs(x-t)==1?3:Math.Abs(x-t)==2?1:0);
-            return h.Distinct().Where(MayDiscard).OrderBy(t=>RiichiHand.Distance(RiichiHand.Counts(Without(s,t)),groups[s].Count)).ThenBy(Value).First();
+        internal int OnlineSuggestion()=>BotDiscard(Turn);
+        internal int OnlineBotClaim(){
+            int seat=OnlineActor;
+            if(BotPong(seat))return BotWantsOpenKong(seat)?Kong:Pung;
+            return BotChow(seat,OnlineChows(seat));
         }
     }
 }

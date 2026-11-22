@@ -143,7 +143,7 @@ namespace NightStud
         bool Pong(int s)=>pendingKong<0 && From!=s && Left>0&&Hands[s].Count(x=>x==Last)>=2;
         internal bool PlayerPong=>Reply && Pong(0);
         internal bool PlayerKong=>PlayerPong&&CanKong&&Hands[0].Count(x=>x==Last)==3;
-        internal bool PlayerChow=>Reply && Chows(0).Count>0 && !Enumerable.Range(1,3).Any(Pong);
+        internal bool PlayerChow=>Reply && Chows(0).Count>0 && !Enumerable.Range(1,3).Any(BotPong);
         bool CanKong=>kongs<4&&Left>0;
         internal int[] OwnKongs(int s){
             if(!CanKong||Drawn<0||Reply||Done||Turn!=s)return Array.Empty<int>();
@@ -209,11 +209,18 @@ namespace NightStud
             for(int d=1;d<=3;d++){
                 int s=(From+d)%4;if(!Pong(s))continue;
                 if(s==0){if(ask){Reply=true;return;}continue;}
-                bool kong=CanKong&&Hands[s].Count(x=>x==Last)==3;
+                if(!BotPong(s))continue;
+                bool kong=BotWantsOpenKong(s);
                 Meld(s,Last,kong?4:3,true);return;
             }
             int next=(From+1)%4;var chows=Chows(next);
-            if(chows.Count>0){if(next==0){if(ask){Reply=true;return;}}else{Meld(next,chows[0],3,false);return;}}
+            if(chows.Count>0){
+                if(next==0){if(ask){Reply=true;return;}}
+                else{
+                    int best=BotChow(next,chows);
+                    if(best>=0){Meld(next,best,3,false);return;}
+                }
+            }
             Draw(next);
         }
         readonly List<int>[] kongTiles=Lists();
@@ -232,11 +239,87 @@ namespace NightStud
         internal void Bot(){
             if(Turn==0||Done||Reply)return;
             if(SelfWin){WinSelf();return;}
-            var ks=OwnKongs(Turn);if(ks.Length>0){OwnKong(ks[0]);return;}
-            var h=Hands[Turn];int s=Turn;
-            int Value(int t)=>h.Sum(x=>x==t?6:x>=27||t>=27||x/9!=t/9?0:Math.Abs(x-t)==1?3:Math.Abs(x-t)==2?1:0);
-            int best=h.Distinct().Where(MayDiscard).OrderBy(t=>RiichiHand.Distance(RiichiHand.Counts(Without(s,t)),groups[s].Count)).ThenBy(Value).First();
-            Discard(best);
+            int seat=Turn;
+            int discard=BotDiscard(seat);
+            if(discard<0)return;
+            int kong=BotOwnKong(seat,discard);
+            if(kong>=0)OwnKong(kong);
+            else Discard(discard);
+        }
+
+        int BotDistance(int seat,IEnumerable<int> hand,int extraGroup=0)=>
+            RiichiHand.Distance(RiichiHand.Counts(hand),groups[seat].Count+extraGroup);
+
+        bool BotPong(int seat)=>Pong(seat)&&BotClaimDistance(seat,Last,true)<BotDistance(seat,Hands[seat]);
+
+        bool BotWantsOpenKong(int seat)=>CanKong&&Hands[seat].Count(tile=>tile==Last)==3&&
+            BotDistance(seat,Hands[seat].Where(tile=>tile!=Last),1)<=BotDistance(seat,Hands[seat]);
+
+        int BotChow(int seat,IEnumerable<int> chows){
+            int current=BotDistance(seat,Hands[seat]);
+            return chows.Select(first=>(first,distance:BotClaimDistance(seat,first,false)))
+                .Where(option=>option.distance<current).OrderBy(option=>option.distance)
+                .Select(option=>option.first).DefaultIfEmpty(-1).First();
+        }
+
+        internal int BotOwnKong(int seat,int discard){
+            if(discard<0)return -1;
+            var candidates=OwnKongs(seat);
+            if(candidates.Length==0)return -1;
+            int current=BotDistance(seat,Without(seat,discard));
+            foreach(int tile in candidates){
+                bool added=Added(tile);
+                var remainder=added?Without(seat,tile):Hands[seat].Where(card=>card!=tile);
+                if(BotDistance(seat,remainder,added?0:1)<=current)return tile;
+            }
+            return -1;
+        }
+
+        int BotClaimDistance(int seat,int first,bool same){
+            var hand=new List<int>(Hands[seat]);
+            if(same){hand.Remove(Last);hand.Remove(Last);}
+            else for(int tile=first;tile<first+3;tile++)if(tile!=Last)hand.Remove(tile);
+            bool Allowed(int tile)=>tile!=Last&&(same||
+                !(Last==first&&first%9<6&&tile==first+3)&&
+                !(Last==first+2&&first%9>0&&tile==first-1));
+            return hand.Distinct().Where(Allowed).Select(tile=>{
+                var left=new List<int>(hand);
+                left.Remove(tile);
+                return BotDistance(seat,left,1);
+            }).DefaultIfEmpty(int.MaxValue).Min();
+        }
+
+        internal readonly double[] SeatStyle=new double[4];
+        int BotDiscard(int seat){
+            int open=groups[seat].Count;
+            var hand=Hands[seat];
+            var options=hand.Distinct().Where(MayDiscard)
+                .Select(tile=>{
+                    var counts=RiichiHand.Counts(Without(seat,tile));
+                    return (tile,counts,distance:RiichiHand.Distance(counts,open));
+                }).ToArray();
+            if(options.Length==0)return -1;
+            int distance=options.Min(option=>option.distance);
+            // Claimed tiles have already been removed from the rivers. Other
+            // seats' concealed kongs contribute no unseen tile identities.
+            var visible=RiichiHand.Counts(hand.Concat(Rivers.SelectMany(river=>river))
+                .Concat(Melds.SelectMany((meld,s)=>s==seat?meld:meld.Where(tile=>!concealedKongs[s].Contains(tile)))));
+            int Live(int[] counts){
+                int live=0;
+                for(int next=0;next<34;next++){
+                    if(visible[next]>=4)continue;
+                    counts[next]++;
+                    if(RiichiHand.Distance(counts,open)<distance)live+=4-visible[next];
+                    counts[next]--;
+                }
+                return live;
+            }
+            double style=SeatStyle[seat];
+            bool defend=Left<=28-48*style&&distance>=2;
+            int Safety(int tile)=>Rivers.Where((river,s)=>s!=seat&&river.Contains(tile)).Count()*3+visible[tile];
+            return options.Where(option=>option.distance==distance)
+                .Select(option=>(option.tile,score:Live(option.counts)+(defend?Safety(option.tile)*(1-2*style):0)))
+                .OrderByDescending(option=>option.score).ThenByDescending(option=>Safety(option.tile)).First().tile;
         }
     }
 }

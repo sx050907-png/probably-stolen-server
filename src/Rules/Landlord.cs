@@ -118,10 +118,54 @@ namespace NightStud
         }
         internal void Bot()
         {
-            if(Boss<0){Bid(Hands[Turn].Count(c=>Rank(c)>=14)>=4);return;}
-            var move=Suggest();
-            if(Last.Length>0 && Leader!=Boss && Turn!=Boss && move.Length!=Hands[Turn].Count)move=Array.Empty<int>();
-            Play(move);
+            if(Winner>=0)return;
+            if(Boss<0)Bid(BotWantsBid());
+            else Play(BotPlay());
+        }
+        internal readonly double[] SeatStyle=new double[3];
+        internal bool BotWantsBid()
+        {
+            var hand=Hands[Turn];
+            double quality=hand.Sum(c=>Rank(c) switch{17=>2.7,16=>1.8,15=>1.05,14=>.55,_=>0});
+            quality+=hand.GroupBy(Rank).Sum(g=>g.Count()==4?2:g.Count()==3?.55:0);
+            return quality>=5.4-3.5*SeatStyle[Turn] || hand.Contains(52)&&hand.Contains(53);
+        }
+        internal int[] BotPlay()
+        {
+            var hand=Hands[Turn];
+            var options=Suggestions();
+            if(options.Length==0 || options[0].Length==hand.Count)return options.FirstOrDefault()??Array.Empty<int>();
+            int next=(Turn+1)%3;
+            bool nextRival=Turn==Boss||next==Boss;
+            int rivalCards=Enumerable.Range(0,3).Where(s=>s!=Turn&&(Turn==Boss||s==Boss)).Min(s=>Hands[s].Count);
+            bool threatened=nextRival&&Hands[next].Count<=2;
+            bool partnerLeading=Last.Length>0 && Leader!=Boss && Turn!=Boss;
+            if(partnerLeading && !(threatened&&Leader>=0&&Hands[Leader].Count>=4&&Last.Length<=rivalCards)){
+                return Array.Empty<int>();
+            }
+
+            var counts=hand.GroupBy(Rank).ToDictionary(group=>group.Key,group=>group.Count());
+            double Cost(int[] play)
+            {
+                var shape=Shape(play);
+                var spent=play.GroupBy(Rank).ToDictionary(group=>group.Key,group=>group.Count());
+                int Remaining(int rank)=>counts[rank]-(spent.TryGetValue(rank,out int number)?number:0);
+                int singles=counts.Keys.Count(rank=>Remaining(rank)==1&&rank<15);
+                int groups=counts.Keys.Count(rank=>Remaining(rank)>0);
+                bool bomb=shape.kind=="炸弹"||shape.kind=="王炸";
+                double cost=singles*2.0+groups*.8+shape.high*(.22-.5*SeatStyle[Turn])-play.Length*1.2;
+                foreach(var group in spent)
+                    if(Remaining(group.Key)>0)cost+=counts[group.Key]==4?11:counts[group.Key]==3?4:1.5;
+                if(bomb)cost+=rivalCards<=2?1:14-20*SeatStyle[Turn];
+                if(rivalCards==1&&play.Length==1)cost+=12-shape.high*1.3;
+                if(Last.Length==0 && threatened && play.Length==Hands[next].Count)cost+=4;
+                return cost;
+            }
+            var move=options.OrderBy(Cost).First();
+            var kind=Shape(move).kind;
+            if(Last.Length>0 && rivalCards>3+5*SeatStyle[Turn] && (kind=="炸弹"||kind=="王炸") && hand.Count-move.Length>3)
+                move=Array.Empty<int>();
+            return move;
         }
     }
 }

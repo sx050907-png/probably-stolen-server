@@ -20,6 +20,7 @@ public sealed class Session(string name,string? accountId=null,string provider="
     public DateTime RateSince = DateTime.UtcNow;
     public int RateCount;
     public HashSet<string> Games=new(StringComparer.Ordinal){"stud"};
+    public string ShopHours="";
     public bool StoreStakes;
     public bool SharedShop;
     public bool ShopReception;
@@ -28,6 +29,7 @@ public sealed class Session(string name,string? accountId=null,string provider="
     public bool CounterBatches;
     public bool Contacts;
     public bool AssetBets;
+    public bool TableTech;
     public string Avatar="hood_ash";
     public DateTime FundsSince=DateTime.UtcNow;
     public int FundsCount;
@@ -46,6 +48,7 @@ public sealed class Room(string code, int ante, int buyIn, string mode="stud", b
     public string Economy {get;}=economy;
     public string LedgerId {get;}=Guid.NewGuid().ToString("N");
     public bool CashFault;
+    public bool TechEnabled;
     public string Code { get; } = code;
     public int Ante { get; } = ante;
     public int BuyIn { get; } = buyIn;
@@ -92,14 +95,14 @@ public sealed partial class RoomHub(int graceSeconds, Action<ServerEvent>? audit
     readonly Dictionary<string, Invitation> invitations = new();
     readonly Dictionary<string, DateTime> inviteCooldown = new();
     sealed record Invitation(string Id,string From,string To,string Code,DateTime Expires);
-    public static readonly string[] Features={"lobby","invitations","stud","three","holdem","blackjack","landlord","mahjong","dice","bots","accounts","privacy","playerFilter","chat","visits","trades","storeStakes","goodsStakes","sharedShop","shopReception","roundGoods","groupGoods","shopBell","shopDisplay","shopCounter","tradeBatch","shopCounterBatch","higherStakes","contacts","playerPhones","playerMarket","physicalGear","gearDurability","gearMaintenance","landlordBanter","tableVoice","tableVoiceAllModes"};
+    public static readonly string[] Features={"lobby","invitations","stud","three","holdem","blackjack","landlord","mahjong","dice","bots","accounts","privacy","playerFilter","chat","visits","trades","storeStakes","goodsStakes","sharedShop","shopReception","roundGoods","groupGoods","shopBell","shopDisplay","shopCounter","tradeBatch","shopCounterBatch","higherStakes","contacts","playerPhones","playerMarket","physicalGear","gearDurability","gearMaintenance","landlordBanter","tableVoice","tableVoiceAllModes","tableTech","shopHours"};
     void Audit(string name,Session session,Room? room=null,string? reason=null)=>audit?.Invoke(new ServerEvent(name,session.Id,room?.Code,room?.Mode,reason));
     static void FundsRate(Session session){
         var now=DateTime.UtcNow;if((now-session.FundsSince).TotalMinutes>=1){session.FundsSince=now;session.FundsCount=0;}
         Need(++session.FundsCount<=60,"funds_rate","暂存操作过于频繁，请稍候再试。");
     }
     public int GraceSeconds { get; } = graceSeconds;
-    static string[] FeaturesFor(Session session)=>Features.Where(f=>(f!="shopBell"||session.ShopBell)&&(f!="shopCounterBatch"||session.CounterBatches)).ToArray();
+    static string[] FeaturesFor(Session session)=>Features.Where(f=>(f!="tableTech"||session.TableTech)&&(f!="shopBell"||session.ShopBell)&&(f!="shopCounterBatch"||session.CounterBatches)).ToArray();
 
     public object Status()
     {
@@ -153,10 +156,14 @@ public sealed partial class RoomHub(int graceSeconds, Action<ServerEvent>? audit
             if (!sessions.TryGetValue(hello.Token ?? "", out var session))
                 throw new WireFault("unauthorized", "会话已过期，请重新连接。");
             Need(moderation?.Banned(session.Id)!=true,"account_banned","该账号已被服主停用。");
+            bool tableTech=hello.Capabilities?.Contains("tableTech")==true;
+            var games=new HashSet<string>((hello.Games??Array.Empty<string>()).Where(OnlineRound.Supported).Take(OnlineRound.Games.Length),StringComparer.Ordinal){"stud"};
+            if(Current(session) is {TechEnabled:true} techRoom)
+                Need(tableTech && games.Contains(techRoom.Mode),"tech_client","请用支持这局玩法和科技桌的客户端重连。");
             session.Client?.Stop();
             session.Client = client;
-            session.Games=new HashSet<string>((hello.Games??new[]{"stud"}).Where(OnlineRound.Supported).Take(OnlineRound.Games.Length),StringComparer.Ordinal);
-            session.Games.Add("stud");
+            session.TableTech=tableTech;
+            session.Games=games;
             session.StoreStakes=hello.Capabilities?.Contains("storeStakes")==true;
             session.SharedShop=hello.Capabilities?.Contains("sharedShop")==true;
             session.ShopReception=session.SharedShop&&hello.Capabilities?.Contains("shopReception")==true;
@@ -185,6 +192,7 @@ public sealed partial class RoomHub(int graceSeconds, Action<ServerEvent>? audit
             if (session.Client != client) return;
             EndPhoneFor(session.Id,"disconnected");
             session.Client = null;
+            if(shops.ContainsKey(session.Id))WithdrawHostedShop(session,"away");
             session.Disconnected = DateTime.UtcNow;
             Audit("session_detached",session,Current(session));
             if (Current(session) is { } room)
@@ -235,6 +243,7 @@ public sealed partial class RoomHub(int graceSeconds, Action<ServerEvent>? audit
                     case "chat": Chat(session,command.Text,command.Channel);client.Send(new{type="ack",id=command.Id,ok=true});return;
                     case "visit": Visit(session,command.Target);break;
                     case "leaveVisit": LeaveVisit(session);break;
+                    case "shopHours": SetShopHours(session,command.Text);client.Send(new{type="ack",id=command.Id,ok=true});return;
                     case "shop": PublishShop(session,command);client.Send(new{type="ack",id=command.Id,ok=true});return;
                     case "shopScene": PublishSharedShop(session,command);client.Send(new{type="ack",id=command.Id,ok=true});return;
                     case "shopSync":case "shopInspect":case "shopAsk":case "shopAnswer":
@@ -255,9 +264,15 @@ public sealed partial class RoomHub(int graceSeconds, Action<ServerEvent>? audit
                     case "acceptInvite": AcceptInvite(session, command); break;
                     case "declineInvite": DeclineInvite(session, command.Invitation); break;
                     case "join": Join(session, command); break;
-                    case "ready": Ready(Revision(session, command), session, command.Ready,command.SaveId); break;
+                    case "ready": Ready(Revision(session, command), session, command.Ready,command.SaveId,command.Enabled==true); break;
                     case "botAdd": SetBot(Revision(session, command),session,true); break;
                     case "botRemove": SetBot(Revision(session, command),session,false); break;
+                    case "techRules": SetTechRules(Revision(session,command),session,command.Enabled); break;
+                    case "useTech":
+                        UseTableTech(Revision(session,command),session,command.Item);
+                        client.Send(new{type="ack",id=command.Id,ok=true});
+                        SendState(session);
+                        return;
                     case "act": Act(Revision(session, command), session, command); break;
                     case "leave": Leave(Revision(session, command), session, "leave"); break;
                     default: throw new WireFault("unknown", "未知操作。");
@@ -319,6 +334,7 @@ public sealed partial class RoomHub(int graceSeconds, Action<ServerEvent>? audit
         Need(rooms.TryGetValue(code, out var room), "not_found", "房间不存在或已关闭。");
         Need(!room!.CashFault,"cash_settling","这间房正在保存结算，请稍后再入座。");
         Need(session.Games.Contains(room!.Mode),"client_update_required","本房间使用新玩法，请先更新客户端和联机组件。 ");
+        Need(!room.TechEnabled||CanPlayTech(session,room),"tech_client","这是科技练习桌，请先更新客户端。");
         if(room.Economy=="store")Need(cash!=null&&session.AccountId!=null&&session.StoreStakes,"cash_client","这间房使用游戏信用点，请登录账号并更新客户端。");
         Need(room.Game is null||room.Game.Done,"playing","本局正在进行，请等下一局再入座。");
         int seat = Array.FindIndex(room!.Seats, s => s is null);
@@ -336,9 +352,10 @@ public sealed partial class RoomHub(int graceSeconds, Action<ServerEvent>? audit
         room.Touched = DateTime.UtcNow;
     }
 
-    void Ready(Room room, Session session, bool ready,string save="")
+    void Ready(Room room, Session session, bool ready,string save="",bool acceptsTech=false)
     {
         Need(room.Game is null || room.Game.Done, "playing", "本手尚未结束。");
+        Need(!ready || acceptsTech==room.TechEnabled,"tech_consent","牌桌规则已变，请看清是否启用科技后再准备。");
         var player = room.Seats[OwnSeat(room, session)]!;
         Need(!room.CashFault,"cash_settling","正在保存这手牌的结算，请稍候。");
         if(room.Economy=="store")Need(player.CashHold.Length>0&&player.SaveId==save,"need_fund","先用当前经营存档暂存入桌信用点。");
@@ -352,6 +369,7 @@ public sealed partial class RoomHub(int graceSeconds, Action<ServerEvent>? audit
                 Need(room.Seats[i]!.Balance>=OnlineRound.Required(room.Mode,room.Ante,i,nextHand),"empty_stack","有座位筹码不足以覆盖本局最高赔付，请重新组局。");
             var initial=room.Seats.Select(s=>s!.Balance).ToArray();
             var game = new OnlineRound(room.Mode,room.Ante,nextHand,initial,new SecureRandom());
+            if(room.TechEnabled)game.Kit=new TableTechHand();
             if(room.Economy=="store")cash!.BeginHand(room.LedgerId,initial,(db,tx)=>goods!.Begin(db,tx,room.LedgerId,nextHand,room.Seats.Select(s=>s!.Session.Id).ToArray()));
             for (int i=0;i<room.Seats.Length;i++){room.Initial[i]=initial[i];room.Seats[i]!.Ready=room.Seats[i]!.Session.Provider=="bot";}
             room.Game=game;room.Hands=nextHand;room.Result=null;
@@ -378,6 +396,7 @@ public sealed partial class RoomHub(int graceSeconds, Action<ServerEvent>? audit
         Need(PendingAsset(room)==null,"asset_pending","正在核对押品，核对完成后继续出牌。");
         int round = game.Round;
         int payment = game.Play(command);
+        game.Kit?.EndTurn(seat);
         Audit("player_action",session,room,command.Move);
         room.Committed[seat] += payment;
         if (room.Events.Count >= 128) room.Events.RemoveAt(0);
@@ -441,6 +460,9 @@ public sealed partial class RoomHub(int graceSeconds, Action<ServerEvent>? audit
         var pending=PendingAsset(room);
         return new { type = "state", playerId = session.Id, room = new {
             code = room.Code, revision = room.Revision, ownSeat = own, ante = room.Ante, buyIn = room.BuyIn,tableId=room.LedgerId,
+            techEnabled=room.TechEnabled,canSetTech=room.HostId==session.Id && SupportsTech(room) && (game==null||game.Done)
+                && room.Seats.All(seat=>seat==null||CanPlayTech(seat.Session,room)),
+            tech=game?.Kit?.View(game,own,paused),
             game=room.Mode, capacity=room.Seats.Length, hostId=room.HostId,economy=room.Economy,goods=GoodsView(room),
             assetPending=pending==null?null:new{id=pending.Id,seat=pending.Seat,expires=pending.Expires},
             assetRules=game is{Done:false,SupportsAssetBets:true}&&AssetsCompatible(room)?new{actor=game.Actor,due=game.Due,minimumBet=game.Unit,minimumRaise=game.MinimumRaise,cash=game.Stack[game.Actor],other=game.Stack[1-game.Actor]}:null,
@@ -463,9 +485,9 @@ public sealed partial class RoomHub(int graceSeconds, Action<ServerEvent>? audit
     }
 
     object DirectoryView(Session viewer)=>new {type="lobby",selfId=viewer.Id,selfPhone=phones?.Number(viewer.AccountId)??"",selfAppearance=viewer.Avatar,features=FeaturesFor(viewer),totalOnline=sessions.Values.Count(Online),filter=viewer.PlayerFilter,privacy=viewer.Privacy,
-        players=sessions.Values.Where(Online).Where(s=>viewer.PlayerFilter=="all"||(s.Provider=="steam")== (viewer.PlayerFilter=="steam")).Take(100).Select(s=>new{id=s.Id,name=s.Name,number=phones?.Number(s.AccountId)??"",provider=s.Provider,avatar=s.Avatar,allowVisits=s.Privacy.AllowVisits&&shops.ContainsKey(s.Id),allowInvites=s.Privacy.AllowInvites,status=s.RoomCode==null?"lobby":Current(s)?.Game is {Done:false}?"playing":"room"}).ToArray(),
-        rooms=rooms.Values.Where(r=>r.Public).Take(64).Select(r=>new{code=r.Code,name=r.Name,game=r.Mode,economy=r.Economy,seats=r.Seats.Count(s=>s!=null),capacity=r.Seats.Length,bots=r.Seats.Count(s=>s?.Session.Provider=="bot"),canJoin=(r.Game is null||r.Game.Done)&&r.Seats.Any(s=>s==null||s.Session.Provider=="bot"),playing=r.Game is {Done:false},ante=r.Ante,buyIn=r.BuyIn}).ToArray(),
-        invitations=invitations.Values.Where(i=>i.To==viewer.Id&&i.Expires>DateTime.UtcNow&&rooms.ContainsKey(i.Code)).Take(8).Select(i=>new{id=i.Id,fromId=i.From,fromName=sessions.Values.FirstOrDefault(s=>s.Id==i.From)?.Name??"桌友",code=i.Code,game=rooms[i.Code].Mode,name=rooms[i.Code].Name,expiresAt=i.Expires}).ToArray()};
+        players=sessions.Values.Where(Online).Where(s=>viewer.PlayerFilter=="all"||(s.Provider=="steam")== (viewer.PlayerFilter=="steam")).Take(100).Select(s=>new{id=s.Id,name=s.Name,number=phones?.Number(s.AccountId)??"",provider=s.Provider,avatar=s.Avatar,visitsEnabled=s.Privacy.AllowVisits,allowVisits=s.Privacy.AllowVisits&&shops.ContainsKey(s.Id)&&HostHours(s)=="",shopHours=s.Privacy.AllowVisits?HostHours(s):"",allowInvites=s.Privacy.AllowInvites,status=s.RoomCode==null?"lobby":Current(s)?.Game is {Done:false}?"playing":"room"}).ToArray(),
+        rooms=rooms.Values.Where(r=>r.Public).Take(64).Select(r=>new{code=r.Code,name=r.Name,game=r.Mode,economy=r.Economy,techEnabled=r.TechEnabled,seats=r.Seats.Count(s=>s!=null),capacity=r.Seats.Length,bots=r.Seats.Count(s=>s?.Session.Provider=="bot"),canJoin=(!r.TechEnabled||CanPlayTech(viewer,r))&&(r.Game is null||r.Game.Done)&&r.Seats.Any(s=>s==null||s.Session.Provider=="bot"),playing=r.Game is {Done:false},ante=r.Ante,buyIn=r.BuyIn}).ToArray(),
+        invitations=invitations.Values.Where(i=>i.To==viewer.Id&&i.Expires>DateTime.UtcNow&&rooms.TryGetValue(i.Code,out var invited)&&(!invited.TechEnabled||CanPlayTech(viewer,invited))).Take(8).Select(i=>new{id=i.Id,fromId=i.From,fromName=sessions.Values.FirstOrDefault(s=>s.Id==i.From)?.Name??"桌友",code=i.Code,game=rooms[i.Code].Mode,techEnabled=rooms[i.Code].TechEnabled,name=rooms[i.Code].Name,expiresAt=i.Expires}).ToArray()};
     void SendDirectory(Session viewer)=>viewer.Client?.Send(DirectoryView(viewer));
     void BroadcastLobby(){foreach(var session in sessions.Values.Where(Online))SendDirectory(session);}
     void Invite(Session sender,string targetId){
@@ -473,6 +495,7 @@ public sealed partial class RoomHub(int graceSeconds, Action<ServerEvent>? audit
         Need((room.Game is null||room.Game.Done)&&room.Seats.Any(s=>s==null||s.Session.Provider=="bot"),"room_full","本局结束或有空位时可以邀请。 ");
         var target=sessions.Values.FirstOrDefault(s=>s.Id==targetId&&Online(s));
         Need(target!=null&&target!=sender,"bad_target","这位玩家已离线。 ");
+        Need(!room.TechEnabled||CanPlayTech(target!,room),"tech_client","对方的客户端还不支持科技桌。");
         Need(target!.Privacy.AllowInvites,"invitations_disabled","对方关闭了牌局邀请。");
         string pair=sender.Id+targetId;var now=DateTime.UtcNow;
         Need(!inviteCooldown.TryGetValue(pair,out var previous)||(now-previous).TotalSeconds>=10,"invite_rate","刚发过邀请，等对方回应。 ");

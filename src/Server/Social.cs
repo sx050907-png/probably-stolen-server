@@ -34,9 +34,13 @@ public sealed partial class RoomHub
         Need(visitor.AccountId!=null,"account_required","登录账号后可串门。");
         Need(visitor.RoomCode==null,"in_room","先离开当前牌局再串门。");
         var owner=FindPlayer(target);Need(owner!=null&&Online(owner)&&owner.Id!=visitor.Id,"visit_unavailable","店主当前不在线。");
-        Need(owner!.Privacy.AllowVisits&&shops.ContainsKey(owner.Id),"visits_disabled","店主暂未开放串门。");
-        Need(owner.RoomCode==null&&!visiting.ContainsKey(owner.Id),"visit_unavailable","店主暂时不在店里。");
+        Need(owner!.Privacy.AllowVisits,"visits_disabled","店主暂未开放串门。");
+        string hours=HostHours(owner);
+        Need(hours!="away","shop_away","当前玩家不在店中，稍后再来吧。");
+        Need(hours!="closed","shop_closed","店主今天已经收摊，明天开店后再来吧。");
+        Need(shops.ContainsKey(owner.Id),"shop_syncing","店铺正在同步，稍等一下。");
         Need(!sharedShops.ContainsKey(owner.Id)||visitor.SharedShop,"client_update","店主使用新版串门，请更新模组后再来。");
+        if(visiting.TryGetValue(visitor.Id,out var currentHost)&&currentHost==target)return;
         Need(visiting.Values.Count(id=>id==target)<4,"visit_full","这家店的访客已满。");
         EndShopPresence(visitor);visiting[visitor.Id]=owner.Id;var shop=shops[owner.Id];
         if(sharedShops.ContainsKey(owner.Id))PlaceNewVisitor(visitor.Id,owner.Id);
@@ -45,12 +49,12 @@ public sealed partial class RoomHub
         BroadcastSharedShop(owner.Id);
         Audit("visit_started",visitor,null,owner.Id);
     }
-    void LeaveVisit(Session visitor){
+    void LeaveVisit(Session visitor,string? reason=null){
         if(!visiting.TryGetValue(visitor.Id,out var host))return;
         CancelVisitTrades(visitor.Id,host);
         visiting.Remove(visitor.Id);
         ClearVisitorActions(visitor.Id);
-        visitor.Client?.Send(new{type="visit",host=(object?)null});
+        visitor.Client?.Send(new{type="visit",host=(object?)null,reason});
         FindPlayer(host)?.Client?.Send(new{type="visitors",players=visiting.Where(p=>p.Value==host).Select(p=>FindPlayer(p.Key)).Where(s=>s!=null).Select(s=>new{id=s!.Id,name=s.Name,provider=s.Provider}).ToArray()});
         BroadcastSharedShop(host);
         Audit("visit_ended",visitor);

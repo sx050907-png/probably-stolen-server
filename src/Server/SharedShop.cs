@@ -57,7 +57,7 @@ public sealed partial class RoomHub
         }
         var state=old??new SharedShopState(scene,encoded);
         if(old!=null&&changed){state.Revision++;state.Scene=scene;state.Encoded=encoded;}
-        state.Published=now;sharedShops[owner.Id]=state;shops[owner.Id]=new Shop(c.Name){Updated=now};
+        owner.ShopHours="";state.Published=now;sharedShops[owner.Id]=state;shops[owner.Id]=new Shop(c.Name){Updated=now};
         foreach(string id in visiting.Where(v=>v.Value==owner.Id).Select(v=>v.Key))if(!visitorPlaces.ContainsKey(id))PlaceNewVisitor(id,owner.Id);
         if(!scene.DoorOpen)foreach(var p in visitorPlaces.Values.Where(p=>p.Host==owner.Id&&p.Place=="inside")){p.Place="counter";p.Facing="front";state.Presence++;}
         foreach(var q in shopInquiries.Values.Where(q=>q.Owner==owner.Id&&(q.Expires<=now||scene.CounterBusy||!scene.Items.Any(i=>SameInquiryItem(q,i)))).ToArray())
@@ -103,7 +103,10 @@ public sealed partial class RoomHub
         if(c.Type is "shopEnter" or "shopExit" or "shopLook"){
             Need(owner!=s.Id&&visitorPlaces.ContainsKey(s.Id),"visit_scope","先到朋友的柜台外再操作。");
             var p=visitorPlaces[s.Id];
-            if(c.Type=="shopEnter")Need(state.Scene.DoorOpen,"door_closed","店主尚未开门，请在柜台外等候。");
+            if(c.Type=="shopEnter"){
+                Need(state.Scene.DoorOpen,"door_closed","店主尚未开门，请在柜台外等候。");
+                Need(!state.Scene.CounterBusy,"counter_busy","店主正在接待顾客，最后一位离开后就轮到访客。");
+            }
             Need(c.SceneRevision==state.Revision,"scene_changed","店铺状态已更新，请再试一次。");
             ShopActionRate(s,"position",.25);
             if(c.Type=="shopEnter"){p.Place="inside";p.Facing="front_three_quarter";}
@@ -178,8 +181,20 @@ public sealed partial class RoomHub
         foreach(var q in shopInquiries.Values.Where(q=>q.Visitor==id).ToArray())EndShopInquiry(q.Id,"left","对方已离店，这次问价结束。");
         foreach(var k in shopActions.Keys.Where(k=>k.Item1==id).ToArray())shopActions.Remove(k);
     }
+    string HostHours(Session owner)=>owner.RoomCode!=null||visiting.ContainsKey(owner.Id)?"away":owner.ShopHours;
+    void SetShopHours(Session owner,string hours){
+        Need(owner.AccountId!=null && owner.SharedShop && hours is "away" or "closed","bad_hours","店铺状态无效。");
+        if(owner.ShopHours==hours&&!shops.ContainsKey(owner.Id))return;
+        owner.ShopHours=hours;
+        WithdrawHostedShop(owner,hours);
+        BroadcastLobby();
+    }
+    void WithdrawHostedShop(Session owner,string hours){
+        foreach(var guest in visiting.Where(v=>v.Value==owner.Id).Select(v=>FindPlayer(v.Key)).ToArray())
+            if(guest!=null)LeaveVisit(guest,hours);
+        shops.Remove(owner.Id);DropSharedShop(owner.Id);
+    }
     void EndShopPresence(Session s){
-        LeaveVisit(s);shops.Remove(s.Id);DropSharedShop(s.Id);
-        foreach(string id in visiting.Where(v=>v.Value==s.Id).Select(v=>v.Key).ToArray())if(FindPlayer(id) is {} guest)LeaveVisit(guest);
+        LeaveVisit(s);WithdrawHostedShop(s,"away");
     }
 }

@@ -5,7 +5,7 @@
     <Nullable>enable</Nullable>
     <InvariantGlobalization>true</InvariantGlobalization>
     <AssemblyName>NightStud.Server</AssemblyName>
-    <Version>0.8.2</Version>
+    <Version>0.8.6</Version>
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="../Shared/GearCatalogue.cs" Link="GearCatalogue.cs" />

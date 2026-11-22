@@ -17,7 +17,11 @@ public sealed partial class RoomHub
     void TickBot(Room room,DateTime now){
         if(room.Game is not {Done:false} game||now<room.NextBot||room.Seats.Any(s=>s==null||!Online(s.Session)))return;
         if(game.Actor<0||room.Seats[game.Actor] is not {} seat||seat.Session.Provider!="bot")return;
-        Act(room,seat.Session,game.Suggest());Broadcast(room);
+        // The same practice partner keeps its temperament across hands.
+        uint hash=2166136261;
+        foreach(char c in seat.Session.Id)hash=unchecked((hash^c)*16777619);
+        double style=((int)(hash%401)-200)/1000.0;
+        Act(room,seat.Session,game.Suggest(style));Broadcast(room);
         if(game.Done)BroadcastLobby();
     }
 }

@@ -51,6 +51,7 @@ public sealed class Command
     public int Ante { get; set; } = 10;
     public int BuyIn { get; set; } = 1000;
     public bool Ready { get; set; } = true;
+    public bool? Enabled {get;set;}
     public string Game { get; set; } = "stud";
     public bool Public { get; set; }
     public string Name { get; set; } = "";

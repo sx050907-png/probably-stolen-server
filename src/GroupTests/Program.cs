@@ -4,6 +4,11 @@ using System.Text.Json;
 using NightStud;
 using NightStud.Server;
 
+if(args.FirstOrDefault()=="--table-tech"){
+    await TableTechTests.Run(args.Length>1?args[1]:Path.Combine("work","tech0524-wire"));
+    return;
+}
+
 int checks=0;
 void Check(bool value,string reason){checks++;if(!value)throw new Exception(reason);}
 string output=args.FirstOrDefault()??Path.Combine(Directory.GetCurrentDirectory(),"work/group040-tests");Directory.CreateDirectory(output);
@@ -162,7 +167,10 @@ File.WriteAllText(Path.Combine(output,"success.txt"),proof);Console.WriteLine(pr
 sealed class Peer:IAsyncDisposable{
     readonly RoomHub hub;readonly Sink socket=new();readonly Client client;readonly CancellationTokenSource stop=new();readonly Task pump;
     public Session Session{get;}public JsonElement Room=>socket.Room;public JsonElement Phrase=>socket.Phrase;public int Phrases=>socket.Phrases;
-    public Peer(RoomHub hub,string name,bool modern=true){this.hub=hub;Session=hub.Login(name);client=new Client(socket);pump=client.Pump(stop.Token);hub.Attach(new Command{Type="hello",Protocol=1,Token=Session.Token,Games=modern?OnlineRound.Games:null},client);}
+    public JsonElement Lobby=>socket.Lobby;
+    public int StateCount=>socket.StateCount;
+    public Peer(RoomHub hub,string name,bool modern=true):this(hub,hub.Login(name),modern){}
+    public Peer(RoomHub hub,Session session,bool modern=true,string[]? capabilities=null){this.hub=hub;Session=session;client=new Client(socket);pump=client.Pump(stop.Token);hub.Attach(new Command{Type="hello",Protocol=1,Token=Session.Token,Games=modern?OnlineRound.Games:null,Capabilities=capabilities},client);}
     public async Task Flush(){Session.RateCount=0;int before=socket.Pongs;hub.Handle(Session,client,new(){Type="ping"});for(int n=0;n<3000&&socket.Pongs==before;n++)await Task.Delay(1);if(socket.Pongs==before)throw new Exception("Flush timeout");}
     public async Task<JsonElement> Command(string type,Action<Command>? set=null){await Flush();var command=new Command{Type=type,Id=Guid.NewGuid().ToString("N"),Revision=Room.ValueKind==JsonValueKind.Object?Room.GetProperty("revision").GetInt64():null};set?.Invoke(command);hub.Handle(Session,client,command);await Flush();return socket.Ack;}
     public async Task Ok(string type,Action<Command>? set=null){var ack=await Command(type,set);if(!ack.GetProperty("ok").GetBoolean())throw new Exception(type+": "+ack);}
@@ -170,11 +178,11 @@ sealed class Peer:IAsyncDisposable{
     public async ValueTask DisposeAsync(){hub.Detach(Session,client);client.Stop();stop.Cancel();await pump;stop.Dispose();}
 }
 sealed class Sink:WebSocket{
-    public JsonElement Room,Ack,Phrase;public int Pongs,Phrases;WebSocketState state=WebSocketState.Open;
+    public JsonElement Room,Ack,Phrase,Lobby;public int Pongs,Phrases,StateCount;WebSocketState state=WebSocketState.Open;
     public override WebSocketCloseStatus? CloseStatus=>null;public override string? CloseStatusDescription=>null;public override WebSocketState State=>state;public override string? SubProtocol=>null;
     public override void Abort()=>state=WebSocketState.Aborted;public override void Dispose()=>Abort();
     public override Task CloseAsync(WebSocketCloseStatus s,string? t,CancellationToken c){Abort();return Task.CompletedTask;}
     public override Task CloseOutputAsync(WebSocketCloseStatus s,string? t,CancellationToken c)=>CloseAsync(s,t,c);
     public override Task<WebSocketReceiveResult> ReceiveAsync(ArraySegment<byte> b,CancellationToken c)=>throw new NotSupportedException();
-    public override Task SendAsync(ArraySegment<byte> bytes,WebSocketMessageType type,bool end,CancellationToken cancel){using var doc=JsonDocument.Parse(bytes.AsMemory());var v=doc.RootElement;switch(v.GetProperty("type").GetString()){case "state":Room=v.GetProperty("room").Clone();break;case "ack":Ack=v.Clone();break;case "tablePhrase":Phrase=v.Clone();Interlocked.Increment(ref Phrases);break;case "pong":Interlocked.Increment(ref Pongs);break;}return Task.CompletedTask;}
+    public override Task SendAsync(ArraySegment<byte> bytes,WebSocketMessageType type,bool end,CancellationToken cancel){using var doc=JsonDocument.Parse(bytes.AsMemory());var v=doc.RootElement;switch(v.GetProperty("type").GetString()){case "state":Room=v.GetProperty("room").Clone();Interlocked.Increment(ref StateCount);break;case "lobby":Lobby=v.Clone();break;case "ack":Ack=v.Clone();break;case "tablePhrase":Phrase=v.Clone();Interlocked.Increment(ref Phrases);break;case "pong":Interlocked.Increment(ref Pongs);break;}return Task.CompletedTask;}
 }

@@ -120,16 +120,27 @@ internal sealed class ExtraRound
             winners=m.Winners.ToArray(),note=m.Note};
         return new{dealer=Dealer,wagered,bet=wagered?(odd?"odd":"even"):"",faces=Done?dice:Array.Empty<int>()};
     }
-    public Command Suggest(){
+    public Command Suggest(double style=0){
+        if(landlord!=null)landlord.SeatStyle[Actor]=style;
+        if(mahjong!=null)mahjong.SeatStyle[Actor]=style;
         if(landlord is {} l){
-            if(l.Boss<0)return new(){Move=l.Hands[l.Turn].Count(c=>Landlord.Rank(c)>=14)>=4?"bid":"decline"};
-            int[] move=l.Suggest();if(l.Last.Length>0&&l.Leader!=l.Boss&&l.Turn!=l.Boss&&move.Length!=l.Hands[l.Turn].Count)move=Array.Empty<int>();
+            if(l.Boss<0)return new(){Move=l.BotWantsBid()?"bid":"decline"};
+            int[] move=l.BotPlay();
             return new(){Move=move.Length>0?"play":"pass",Cards=move};
         }
         var m=mahjong!;var legal=Legal();
         var win=legal.FirstOrDefault(o=>o.Move is "win" or "selfWin");if(win!=null)return new(){Move=win.Move};
-        var meld=legal.FirstOrDefault(o=>o.Move is "kong" or "pung" or "chow");if(meld!=null)return new(){Move=meld.Move,Choice=meld.Choice};
-        return m.Reply?new(){Move="pass"}:new(){Move="discard",Choice=m.OnlineSuggestion()};
+        if(m.Reply){
+            int claim=m.OnlineBotClaim();
+            return claim switch{
+                Mahjong.Kong=>new(){Move="kong",Choice=m.Last},
+                Mahjong.Pung=>new(){Move="pung"},
+                >=0=>new(){Move="chow",Choice=claim},
+                _=>new(){Move="pass"}
+            };
+        }
+        int discard=m.OnlineSuggestion(),kong=m.BotOwnKong(Actor,discard);
+        return kong>=0?new(){Move="kong",Choice=kong}:new(){Move="discard",Choice=discard};
     }
     public void Forfeit(int seat){
         if(Done)return;

@@ -17,6 +17,7 @@ public sealed class OnlineRound
     readonly List<int> board=new();
     int pot,round=1,actor,actions,winner=-1,finalPot,lastRaise;
     bool done,reveal;
+    internal TableTechHand? Kit;
     public string Mode { get; }
     public int Ante { get; }
     public int Number { get; }
@@ -63,7 +64,7 @@ public sealed class OnlineRound
     string description="";
     public string Description {get=>extra?.Description??description;private set=>description=value;}
     public object? Detail(int viewer)=>extra?.View(viewer);
-    public Command Suggest()=>extra?.Suggest()??throw new InvalidOperationException("Bots are available on group tables");
+    public Command Suggest(double style=0)=>extra?.Suggest(style)??throw new InvalidOperationException("Bots are available on group tables");
     public static readonly string[] Games={"stud","three","holdem","blackjack","landlord","mahjong","dice"};
     public static bool Supported(string mode)=>Games.Contains(mode);
     public static int Capacity(string mode)=>mode=="landlord"?3:mode=="mahjong"?4:2;

@@ -7,7 +7,7 @@ void Check(bool ok,string why){checks++;if(!ok)throw new Exception(why);}
 var root=Path.GetFullPath(args[0]);Directory.CreateDirectory(root);
 var scene=JsonSerializer.Deserialize<ShopScene>(File.ReadAllText(args[1]),Wire.Json)!;scene.Generation=Guid.NewGuid().ToString("N");scene.DoorOpen=false;scene.CounterBusy=false;
 var accounts=new Accounts(Path.Combine(root,"accounts"));var hub=new RoomHub(3,null,accounts);
-Check(ServerBuild.Version=="0.6.6"&&JsonSerializer.SerializeToElement(hub.Status(),Wire.Json).GetProperty("version").GetString()==ServerBuild.Version,"health uses current assembly version shared with auth options and startup log");
+Check(Version.TryParse(ServerBuild.Version,out _)&&JsonSerializer.SerializeToElement(hub.Status(),Wire.Json).GetProperty("version").GetString()==ServerBuild.Version,"health uses current assembly version shared with auth options and startup log");
 async Task<Peer> Make(string name,bool bell=true){var id=await accounts.Register(name,"test-password-long-6499",name);return new Peer(hub,hub.LoginAccount(id),true,false,bell);}
 await using var host=await Make("host");await using var guest=await Make("guest");await using var second=await Make("second");await using var outsider=await Make("outsider");await using var old=await Make("oldhost",false);
 async Task Ok(Peer p,string type,Action<Command>? change=null){var a=await p.Command(type,change);Check(a.GetProperty("ok").GetBoolean(),type+": "+a);}
